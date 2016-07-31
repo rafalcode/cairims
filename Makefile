@@ -4,7 +4,8 @@ SPECLIBS=-lcairo -lm
 SPECINC=-I/home/nutria/mylocal/include
 EXECUTABLES=binodot binind bini2 bini3 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 six b13 b14 doto
 
-doto: doto.c
+# small tiny shapes for testing on eigbirds.
+smasha: smasha.c
 	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
 
 binodot: binodot.c
