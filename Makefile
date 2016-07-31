@@ -8,6 +8,10 @@ EXECUTABLES=binodot binind bini2 bini3 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 six b13 
 smasha: smasha.c
 	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
 
+# generate a quantity of small tiny shapes with random colours
+smasha2: smasha2.c
+	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
+
 binodot: binodot.c
 	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
 

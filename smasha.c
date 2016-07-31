@@ -32,7 +32,7 @@ int main (int argc, char *argv[])
 		exit(EXIT_FAILURE);
     }
 
-    int width=64, height=64;
+    int width=16, height=16;
     cairo_surface_t *surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, width, height);
     cairo_t *cr = cairo_create (surface);
 
@@ -42,7 +42,7 @@ int main (int argc, char *argv[])
     cairo_fill (cr);
 
     /* Drawing code goes here */
-    cairo_set_source_rgb(cr, 1, 0.5, 0.5);
+    cairo_set_source_rgb(cr, 0.8, 0.2, 0.4);
     switch(ourtype) {
         case CENCIRC:
             cairo_arc(cr, width/2, height/2, 8, 0, 2 * M_PI); break;
