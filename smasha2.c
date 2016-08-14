@@ -37,12 +37,12 @@ int main (int argc, char *argv[])
     /* argument accounting: here were present the siddferetn shapes that are possible with this program */
     if(argc!=3) {
         printf("smasha2. a program to generate small images of certain shapes and random colours.\n");
-        printf("Error. Pls supply 2 arguments: 1) number of shapes to generate. 2) size in pixels (all images square).\n");
+        printf("Error. Pls supply 2 arguments: 1) number of shapes to generate. 2) size in pixels (in 1D, so total pixels will be this squared).\n");
         exit(EXIT_FAILURE);
     }
 
     int n=atoi(argv[1]);
-    int n3=3*n;
+    int n3=3*n; // for each image we'll want 3 0-1 floats for color-setting.
 
     char nm[32]={0};
 
@@ -58,7 +58,7 @@ int main (int argc, char *argv[])
 
     for(i=0;i<n;++i) {
         cairo_rectangle (cr, 0, 0, width, height); /* arg explan: topleftcorner and size of shape  */
-        cairo_set_source_rgb(cr, 0.1, 0.1, 0.1); /*  final number is alpha, 1.0 is opaque */
+        cairo_set_source_rgb(cr, 0.3, 0.3, 0.3); /* setting background, probab black or grey */
         cairo_fill (cr);
 
         /* Drawing code goes here */
@@ -72,7 +72,7 @@ int main (int argc, char *argv[])
                 break;
         }
         cairo_fill(cr);
-        sprintf(nm, "im_%03d.png", i);
+        sprintf(nm, "smim_%03d.png", i);
         /* Write output and clean up */
         cairo_surface_write_to_png (surface, nm);
     }
