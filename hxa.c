@@ -34,33 +34,20 @@ sha_t *rshat(int howmany)
 
 int main (int argc, char *argv[])
 {
-    /* argument accounting: here were present the siddferetn shapes that are possible with this program */
-    if(argc!=3) {
-        printf("smasha2. a program to generate small images of certain shapes and random colours.\n");
-        printf("Error. Pls supply 2 arguments: 1) number of shapes to generate. 2) size in pixels (in 1D, so total pixels will be this squared).\n");
-        exit(EXIT_FAILURE);
-    }
-
-    int n=atoi(argv[1]);
-    int n3=3*n; // for each image we'll want 3 0-1 floats for color-setting.
-
-    char nm[32]={0};
-
     int width=atoi(argv[2]);
     int height=width;
     cairo_surface_t *surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, width, height);
     cairo_t *cr = cairo_create (surface);
-    int i;
-    float *r=randf01(n3*2);
-    float *circdiv=randf01(n); // circle divisor
+    cairo_set_source_rgb(cr, 0.1, 0.1, 0.1); /* setting background, probab black or grey */
+    cairo_rectangle (cr, 0, 0, width, height); /* arg explan: topleftcorner and size of shape  */
+    cairo_fill (cr);
+
     for(i=0;i<n;++i) 
         circdiv[i] = 2*circdiv[i]+3.0; // so divisor will vary from 3 to 6
     sha_t *rsha=rshat(n);
 
     /*  first we're going to set the background */
 
-    for(i=0;i<n;++i) {
-        cairo_rectangle (cr, 0, 0, width, height); /* arg explan: topleftcorner and size of shape  */
         cairo_set_source_rgb(cr, 0.1, 0.1, 0.1); /* setting background, probab black or grey */
         cairo_fill (cr);
 

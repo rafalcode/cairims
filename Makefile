@@ -2,13 +2,15 @@ CC=gcc
 CFLAGS=-g -Wall
 SPECLIBS=-lcairo -lm
 SPECINC=-I/home/nutria/mylocal/include
-EXECUTABLES=binodot binind bini2 bini3 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 six b13 b14 doto
+EXECUTABLES=binodot binind bini2 bini3 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 six b13 b14 doto smasha2
 
-# small tiny shapes for testing on eigbirds.
+# small tiny shapes for testing on eigbirds. Tried to not make this output interlaced PNG files
+# but cairo docs explain that this also is a toy API, no control over that.
 smasha: smasha.c
 	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
 
 # generate a quantity of small tiny shapes with random colours
+# initially it was either rect of circle ... but the overall shape needs to be the same ... so now it's rect with algithly varying circle inside
 smasha2: smasha2.c
 	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
 
