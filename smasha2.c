@@ -65,15 +65,21 @@ int main (int argc, char *argv[])
         cairo_fill (cr);
 
         /* make a simple shape .... outer one must be the same though! */
-        cairo_set_source_rgb(cr, r[3*2*i], r[3*2*i+1], r[3*2*i+2]);
+        // cairo_set_source_rgb(cr, r[3*2*i], r[3*2*i+1], r[3*2*i+2]);
+        // // quick black and white
+        cairo_set_source_rgb(cr, r[3*2*i], r[3*2*i], r[3*2*i]);
         cairo_rectangle (cr, width/7., height/7., 4*width/5., 4*height/5.);
         cairo_fill(cr); // when you change source colour .. you've got to cairo_fill!
 
-        cairo_set_source_rgb(cr, r[3*2*i+3], r[3*2*i+4], r[3*2*i+5]);
+        // cairo_set_source_rgb(cr, r[3*2*i+3], r[3*2*i+4], r[3*2*i+5]);
+        // // quick black and white
+        cairo_set_source_rgb(cr, r[3*2*i+3], r[3*2*i+3], r[3*2*i+3]);
         cairo_arc(cr, width/2., height/2., width/circdiv[i], 0, 2 * M_PI);
         cairo_fill(cr);
 
-        sprintf(nm, "smim_%03d.png", i);
+        // sprintf(nm, "smim_%03d.png", i);
+        // // quick for B&W
+        sprintf(nm, "bwim_%03d.png", i);
         /* Write output and clean up */
         cairo_surface_write_to_png (surface, nm);
     }
