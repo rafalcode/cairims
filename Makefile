@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-g -Wall
 SPECLIBS=-lcairo -lm
 SPECINC=-I/home/nutria/mylocal/include
-EXECUTABLES=binodot binind bini2 bini3 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 six b13 b14 doto smasha2
+EXECUTABLES=binodot binind bini2 bini3 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 six b13 b14 doto smasha2 scalin
 
 # small tiny shapes for testing on eigbirds. Tried to not make this output interlaced PNG files
 # but cairo docs explain that this also is a toy API, no control over that.
@@ -18,7 +18,11 @@ binodot: binodot.c
 	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
 
 # tree triangs
+# # actually quite like this one .. it's very simple, a good building block
 trndot: trndot.c
+	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
+
+scalin: scalin.c
 	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
 
 td2: td2.c
