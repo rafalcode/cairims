@@ -1,8 +1,7 @@
 CC=gcc
 CFLAGS=-g -Wall
 SPECLIBS=-lcairo -lm
-SPECINC=-I/home/nutria/mylocal/include
-EXECUTABLES=binodot binind bini2 bini3 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 six b13 b14 doto smasha2
+EXECUTABLES=binodot binind bini2 bini3 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 six b13 b14 doto smasha2 dric3
 
 # small tiny shapes for testing on eigbirds. Tried to not make this output interlaced PNG files
 # but cairo docs explain that this also is a toy API, no control over that.
@@ -96,6 +95,11 @@ b13: b13.c
 b14: b14.c
 	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
 
+# rescuing
+dric3: dric3.c
+	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
+
+# Hang on, the new integrated system was not implemented properly, or I started messing?
 # Hang on, the new integrated system was not implemented properly, or I started messing?
 # # Well I got over one, glitch only to be met by another. The 
 # # Hmm. a lot of dabbling .. messing up the hpos
