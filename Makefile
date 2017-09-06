@@ -22,6 +22,11 @@ binodot: binodot.c
 trndot: trndot.c
 	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
 
+# Cairo and SVG ... don't think that just because Cairo is vector graphics that its SVG modes
+# are crystal clear. In fact you need an extra h file ... cairo-svg.h
+svrad0: svrad0.c
+	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
+
 scalin: scalin.c
 	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
 
