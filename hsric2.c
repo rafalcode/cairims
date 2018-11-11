@@ -1,5 +1,6 @@
-/*  a bouncing horse race: this appears to use simple random
- *  numbers and not the exponenetial waiting time */
+/*  a bouncing horse race: 
+ *  BEWARE this uses simple random
+ *  numbers and not the exponential waiting time */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,6 +22,7 @@
 #define HEI 480 /* height of canvas */
 #define HBARNUMS NUMHO /* our horizontal bars is when the horses' tracks will be */
 #define STRBF 128 /* buffer for strings */
+#define LTHI 16 /* line thickness */
 
 /* only global */
 const float FONTSZ=14.0; /* the size (number of colours) that our colorscheme has */
@@ -116,7 +118,7 @@ int main(int argc, char *argv[])
 
     /* OK, now we're going to paint up the position vectors */
     int canvfr, canvto;
-    cairo_set_line_width (cr, 4);
+    cairo_set_line_width (cr, LTHI);
     // char somestr[]="testtextsuavemente";
     char *somestr;
     somestr=calloc(sizeof(char), STRBF);
@@ -129,9 +131,9 @@ int main(int argc, char *argv[])
                 canvto=WID-RMAR;
 
             if(j%2 != 0) /*  set alternate colours */ 
-                cairo_set_source_rgba(cr, colsf[5].rgb[0], colsf[5].rgb[1], colsf[5].rgb[2], 0.95);
+                cairo_set_source_rgba(cr, colsf[7].rgb[0], colsf[7].rgb[1], colsf[7].rgb[2], 0.95);
             else
-                cairo_set_source_rgba(cr, colsf[11].rgb[0], colsf[11].rgb[1], colsf[11].rgb[2], 0.95);
+                cairo_set_source_rgba(cr, colsf[15].rgb[0], colsf[15].rgb[1], colsf[15].rgb[2], 0.95);
 
             cairo_move_to(cr, canvfr ,hbars[i] +4);
             cairo_line_to(cr, canvto ,hbars[i] +4);
@@ -142,8 +144,9 @@ int main(int argc, char *argv[])
         /* print the array of positional values values too? */
 
             cairo_text_extents (cr, somestr, &te);
-            cairo_move_to (cr, LMAR - te.x_bearing, hbars[i]-4 - fe.descent + fe.height/2);
-            cairo_set_source_rgb(cr, 0.3, 0.2, .2);
+            // horiz pos, the integer substracting from hbars is the most influential
+            cairo_move_to (cr, LMAR - te.x_bearing, hbars[i]-12 - fe.descent + fe.height);
+            cairo_set_source_rgb(cr, .8, .8, .8);
             cairo_show_text (cr, somestr);
     }
 
