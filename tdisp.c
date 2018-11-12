@@ -97,11 +97,12 @@ int main (int argc, char *argv[])
         cairo_set_source_rgb(cr, .8, .8, .8);
         cairo_show_text (cr, tstr);
 
-        // now the line 
+        // now the first line 
         cairo_set_source_rgba(cr, colsf[13].rgb[0], colsf[13].rgb[1], colsf[13].rgb[2], 0.95);
+        // start only half way thourhg first second, and stop at finishline
+        if((fsum<llen) & (i>FPSEC/2))
+                fsum += finc;
         cairo_move_to(cr, LMAR , 300);
-        if(fsum<llen)
-            fsum += finc;
         cairo_line_to(cr, fsum , 300);
         cairo_stroke (cr);
 
