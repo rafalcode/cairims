@@ -81,8 +81,10 @@ int main (int argc, char *argv[])
     int llen= width -2*LMAR;
     float finc=(float)llen/n;
     float fsum=.0;
+    float fsum2=.0;
 
-    for(i=0;i<n;++i) {
+    i=0;
+    while(fsum2<llen) {
         cairo_rectangle (cr, 0, 0, width, height); /* arg explan: topleftcorner and size of shape  */
         cairo_set_source_rgb(cr, 0.1, 0.1, 0.1); /* setting background, probab black or grey */
         cairo_fill (cr);
@@ -96,15 +98,23 @@ int main (int argc, char *argv[])
         cairo_show_text (cr, tstr);
 
         // now the line 
-        cairo_set_source_rgba(cr, colsf[15].rgb[0], colsf[15].rgb[1], colsf[15].rgb[2], 0.95);
+        cairo_set_source_rgba(cr, colsf[13].rgb[0], colsf[13].rgb[1], colsf[13].rgb[2], 0.95);
         cairo_move_to(cr, LMAR , 300);
-        fsum += finc;
+        if(fsum<llen)
+            fsum += finc;
         cairo_line_to(cr, fsum , 300);
         cairo_stroke (cr);
 
+        // now the line 
+        cairo_set_source_rgba(cr, colsf[8].rgb[0], colsf[8].rgb[1], colsf[8].rgb[2], 0.95);
+        cairo_move_to(cr, LMAR , 340);
+        fsum2 += 2*finc/3.;
+        cairo_line_to(cr, fsum2 , 340);
+        cairo_stroke (cr);
 
         /* Write output and clean up */
         cairo_surface_write_to_png (surface, nm);
+        i++;
     }
     cairo_destroy (cr);
     cairo_surface_destroy (surface);
