@@ -34,14 +34,13 @@ char *mktmpd(void)
 {
     struct timeval tsecs;
     gettimeofday(&tsecs, NULL);
-    char *myt=calloc(14, sizeof(char));
-    strncpy(myt, "tmpdir_", 7);
-    sprintf(myt+7, "%lu", tsecs.tv_usec);
+    char *myt=calloc(FNAMSZ, sizeof(char));
+    sprintf(myt, "tmpdir_%lu", tsecs.tv_usec);
 
     DIR *d;
     while((d = opendir(myt)) != NULL) { /* see if a directory witht the same name exists ... very low likelihood though */
         gettimeofday(&tsecs, NULL);
-        sprintf(myt+7, "%lu", tsecs.tv_usec);
+        sprintf(myt, "tmpdir_%lu", tsecs.tv_usec);
         closedir(d);
     }
     closedir(d);
@@ -80,8 +79,8 @@ int main (int argc, char *argv[])
     int i;
     int llen= width -2*LMAR;
     float finc=(float)llen/n;
-    float fsum=.0;
-    float fsum2=.0;
+    float fsum=LMAR;
+    float fsum2=LMAR;
 
     i=0;
     while(fsum2<llen) {
@@ -100,11 +99,13 @@ int main (int argc, char *argv[])
         // now the first line 
         cairo_set_source_rgba(cr, colsf[13].rgb[0], colsf[13].rgb[1], colsf[13].rgb[2], 0.95);
         // start only half way thourhg first second, and stop at finishline
-        if((fsum<llen) & (i>FPSEC/2))
+        if(i>FPSEC) {
+            if(fsum<llen)
                 fsum += finc;
-        cairo_move_to(cr, LMAR , 300);
-        cairo_line_to(cr, fsum , 300);
-        cairo_stroke (cr);
+            cairo_move_to(cr, LMAR , 300);
+            cairo_line_to(cr, fsum , 300);
+            cairo_stroke (cr);
+        }
 
         // now the line 
         cairo_set_source_rgba(cr, colsf[8].rgb[0], colsf[8].rgb[1], colsf[8].rgb[2], 0.95);
