@@ -1,10 +1,15 @@
 /* trying to sort out waiting time formula */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <sys/time.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<math.h>
+#include<sys/time.h>
 #include<unistd.h> // for the opts handling and abort()
+#include<iostream>
+#include<vector>
+#include<array>
+
+using namespace std;
 
 #define SETSEED 5 /*  if -DUNPREDRA is not fed in */
 #define MX 20
@@ -73,14 +78,21 @@ int main(int argc, char *argv[])
     int j;
     float ura /*  variable to hold one uniform random variable 0-1 */, cumflt;
 
+    vector<float> eveca[numreps]; // exponen vector array
+
     for(j=0;j<numreps;++j) {
         cumflt=.0;
         do {
             ura= 1. - (float)rand()/(RAND_MAX);
             cumflt += -log(ura)/lambd;
+            eveca[j].push_back(cumflt);
             printf("%4.4f ", cumflt);
         } while(cumflt <1.);
         printf("\n"); 
     }
+    for(float f : eveca[0])
+        cout << f << ' ';
+    printf("\n"); 
+
     return 0;
 }

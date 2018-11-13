@@ -1,9 +1,10 @@
 CC=gcc
+CPP=g++
 CFLAGS=-g -Wall
 SPECLIBS=-lcairo -lm
 SPECINC=-I/home/nutria/mylocal/include
 
-EXECUTABLES=binodot binind bini2 bini3 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 six b13 b14 doto smasha2 scalin dric3 td2 rcol hsric2 scalin2 tdisp
+EXECUTABLES=binodot binind bini2 bini3 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 six b13 b14 doto smasha2 scalin dric3 td2 rcol hsric2 scalin2 tdisp expti0
 
 # small tiny shapes for testing on eigbirds. Tried to not make this output interlaced PNG files
 # but cairo docs explain that this also is a toy API, no control over that.
@@ -132,6 +133,12 @@ rcol: rcol.c
 # Just display time
 tdisp: tdisp.c
 	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
+# simple exponential time variates ... hoepfully concentrating on the 1km
+# # you can expect something int he range of 2 to 8 events (pretty much max, set it to 3 or 4.
+expti0: expti0.c
+	${CC} ${CFLAGS} -o $@ $^
+expti1: expti1.cpp
+	${CPP} ${CFLAGS} -o $@ $^
 
 .PHONY: clean
 
