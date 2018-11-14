@@ -7,7 +7,6 @@
 #include<unistd.h> // for the opts handling and abort()
 #include<iostream>
 #include<vector>
-#include<array>
 
 using namespace std;
 
@@ -36,9 +35,9 @@ int catchopts(optstruct *opstru, int oargc, char **oargv)
             case 'l': // print per-sample Tech Rep resolution events
                 opstru->lfloat = optarg;
                 break;
-			case '?':
-				if( (optopt == 'n') | (optopt =='l') ) {
-					fprintf (stderr, "Option -%c requires a number.\n", optopt);
+            case '?':
+                if( (optopt == 'n') | (optopt =='l') ) {
+                    fprintf (stderr, "Option -%c requires a number.\n", optopt);
                     exit(EXIT_FAILURE);
                 }
             default:
@@ -86,13 +85,13 @@ int main(int argc, char *argv[])
             ura= 1. - (float)rand()/(RAND_MAX);
             cumflt += -log(ura)/lambd;
             eveca[j].push_back(cumflt);
-            printf("%4.4f ", cumflt);
         } while(cumflt <1.);
-        printf("\n"); 
     }
-    for(float f : eveca[0])
-        cout << f << ' ';
-    printf("\n"); 
+    for(j=0;j<numreps;++j) {
+        for(float f : eveca[j])
+            cout << f << ' ';
+        cout << endl;
+    }
 
     return 0;
 }
