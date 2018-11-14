@@ -13,6 +13,12 @@ using namespace std;
 #define SETSEED 5 /*  if -DUNPREDRA is not fed in */
 #define MX 20
 
+typedef struct /* ev_t, event type: a float (time) and the jump quantity */
+{
+    float f;
+    int j; // jump to be taken at that float time
+} ev_t; // event type
+
 typedef struct /* optstruct, a struct for the options */
 {
     int uflag; // unpredictble ... i.e. chooses a different randon seed each time.
@@ -78,6 +84,7 @@ int main(int argc, char *argv[])
     float ura /*  variable to hold one uniform random variable 0-1 */, cumflt;
 
     vector<float> eveca[numreps]; // exponen vector array
+    vector<ev_t> ev2[numreps]; // exponen vector array
 
     for(j=0;j<numreps;++j) {
         cumflt=.0;
@@ -85,11 +92,17 @@ int main(int argc, char *argv[])
             ura= 1. - (float)rand()/(RAND_MAX);
             cumflt += -log(ura)/lambd;
             eveca[j].push_back(cumflt);
+            ev2[j].push_back({cumflt, 2});
         } while(cumflt <1.);
     }
+    // for(j=0;j<numreps;++j) {
+    //     for(float f : eveca[j])
+    //         cout << f << ' ';
+    //     cout << endl;
+    // }
     for(j=0;j<numreps;++j) {
-        for(float f : eveca[j])
-            cout << f << ' ';
+        for(ev_t ev : ev2[j])
+            cout << ev.f << '/' << ev.j << ' ';
         cout << endl;
     }
 
