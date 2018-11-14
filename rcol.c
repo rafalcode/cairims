@@ -16,7 +16,7 @@
 /* principal image and block settings */
 #define IMWIDTH 640
 #define IMHEIGHT 640
-#define CBNUM 4 /* number of column bands */
+#define CBNUM 8 /* number of column bands */
 #define RBNUM CBNUM /* number of row-bands */
 
 /* derived settings */
