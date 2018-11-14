@@ -4,7 +4,7 @@ CFLAGS=-g -Wall
 SPECLIBS=-lcairo -lm
 SPECINC=-I/home/nutria/mylocal/include
 
-EXECUTABLES=binodot binind bini2 bini3 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 six b13 b14 doto smasha2 scalin dric3 td2 rcol hsric2 scalin2 tdisp expti0
+EXECUTABLES=binodot binind bini2 bini3 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 six b13 b14 doto smasha2 scalin dric3 td2 rcol hsric2 scalin2 tdisp expti0 expti1
 
 # small tiny shapes for testing on eigbirds. Tried to not make this output interlaced PNG files
 # but cairo docs explain that this also is a toy API, no control over that.
@@ -139,6 +139,10 @@ expti0: expti0.c
 	${CC} ${CFLAGS} -o $@ $^
 expti1: expti1.cpp
 	${CPP} ${CFLAGS} -o $@ $^
+# learnings: a with DNA evol by Hulsenbeck, the time at which event occurs and what 
+# the event transpires to be are two different things.
+# if you use expone time as hop distances it's only right if time is linked to distance
+# but usually, the distance is a free untied quantity, use 1, 2 or 3 hops
 
 .PHONY: clean
 
