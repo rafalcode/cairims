@@ -81,6 +81,25 @@ int rajuhh(int quanju) /* not equl odds, higher is rarer, of course */
     return i+1;
 }
 
+vector<ev_t> *get_race(int numreps /* 2 to start with */, int randju, float lambd)
+{
+    int j;
+    float ura /*  variable to hold one uniform random variable 0-1 */, cumflt;
+    vector<ev_t> *ev2=new (nothrow) vector<ev_t>[numreps];
+
+    for(j=0;j<numreps;++j) {
+        cumflt=.0;
+        do {
+            ura= 1. - (float)rand()/(RAND_MAX);
+            cumflt += -log(ura)/lambd;
+            ev2[j].push_back({cumflt, rajuhh(randju)});
+        } while(cumflt <1.);
+    }
+
+    return ev2;
+}
+
+
 int main(int argc, char *argv[])
 {
     if(argc<4) {
@@ -108,28 +127,18 @@ int main(int argc, char *argv[])
         srand(SETSEED);
 
     int numreps = atoi(opstru.nnum);
-    int randju = atoi(opstru.jnum); /* random vairate of jumps associate with an event */
+    int mxju = atoi(opstru.jnum); /* random vairate of jumps associate with an event */
     float lambd = atof(opstru.lfloat);
 
+    vector<ev_t> *ev2=get_race(numreps, mxju, lambd);
+
     int j;
-    float ura /*  variable to hold one uniform random variable 0-1 */, cumflt;
-
-    vector<ev_t> ev2[numreps]; // exponen vector array
-
-    for(j=0;j<numreps;++j) {
-        cumflt=.0;
-        do {
-            ura= 1. - (float)rand()/(RAND_MAX);
-            cumflt += -log(ura)/lambd;
-            ev2[j].push_back({cumflt, rajuhh(randju)});
-        } while(cumflt <1.);
-    }
     for(j=0;j<numreps;++j) {
         for(ev_t ev : ev2[j])
             // cout << 'At time ' << ev.f << ', ' << ev.j << ' jumps / ';
             printf("At time %4.4f: %i jumps / ", ev.f, ev.j);
          printf("\n"); 
     }
-
+    delete[] ev2;
     return 0;
 }
