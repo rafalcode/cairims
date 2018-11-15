@@ -3,6 +3,10 @@ CPP=g++
 CFLAGS=-g -Wall
 SPECLIBS=-lcairo -lm
 SPECINC=-I/home/nutria/mylocal/include
+# NOTE: beware cairomm, it can be a little devil to compile
+# prob due to its being part of a bigger project
+SPECINC2=`pkg-config --cflags cairomm-1.0`
+SPECLIBS2=`pkg-config --libs cairomm-1.0`
 
 EXECUTABLES=binodot binind bini2 bini3 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 six b13 b14 doto smasha2 scalin dric3 td2 rcol hsric2 scalin2 tdisp expti0 expti1 randju0 expti2 jura0
 
@@ -150,7 +154,10 @@ expti2: expti2.cpp
 	${CPP} ${CFLAGS} -o $@ $^
 # jump race, sticking all these together
 jura0: jura0.cpp
-	${CPP} ${CFLAGS} -o $@ $^
+	${CPP} ${CFLAGS} -o $@ $^ ${SPECLIBS}
+# example of cairomm which is the c++ PAI for cairo
+mm0: mm0.cpp
+	${CPP} ${CFLAGS} ${SPECINC2} -o $@ $^ ${SPECLIBS2}
 
 .PHONY: clean
 
