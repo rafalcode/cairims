@@ -8,7 +8,7 @@ SPECINC=-I/home/nutria/mylocal/include
 SPECINC2=`pkg-config --cflags cairomm-1.0`
 SPECLIBS2=`pkg-config --libs cairomm-1.0`
 
-EXECUTABLES=binodot binind bini2 bini3 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 six b13 b14 doto smasha2 scalin dric3 td2 rcol hsric2 scalin2 tdisp expti0 expti1 randju0 expti2 jura0
+EXECUTABLES=binodot binind bini2 bini3 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 six b13 b14 doto smasha2 scalin dric3 td2 rcol hsric2 scalin2 tdisp expti0 expti1 randju0 expti2 jura0 jura0_d
 
 # small tiny shapes for testing on eigbirds. Tried to not make this output interlaced PNG files
 # but cairo docs explain that this also is a toy API, no control over that.
@@ -155,6 +155,8 @@ expti2: expti2.cpp
 # jump race, sticking all these together
 jura0: jura0.cpp
 	${CPP} ${CFLAGS} -o $@ $^ ${SPECLIBS}
+jura0_d: jura0.cpp
+	${CPP} ${CFLAGS} -DDBG -o $@ $^ ${SPECLIBS}
 # example of cairomm which is the c++ PAI for cairo
 mm0: mm0.cpp
 	${CPP} ${CFLAGS} ${SPECINC2} -o $@ $^ ${SPECLIBS2}
