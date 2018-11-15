@@ -1,9 +1,10 @@
-/* jump race */
-#include <cairo/cairo.h>
-#include <math.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+/* jump race: fixed at two participants for the time being. */
+#include<cairo/cairo.h>
+#include<math.h>
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+#include<unistd.h>
 #include<sys/time.h>
 #include<sys/stat.h>
 #include<dirent.h> 
@@ -35,7 +36,7 @@ typedef struct /* optstruct, a struct for the options */
 {
     int uflag; // unpredictble ... i.e. chooses a different randon seed each time.
     char *lfloat;
-    char *nnum;
+    char *snum;
     char *jnum;
 } optstruct;
 
@@ -43,13 +44,13 @@ int catchopts(optstruct *opstru, int oargc, char **oargv)
 {
     int c;
     opterr = 0;
-    while ((c = getopt (oargc, oargv, "un:l:j:")) != -1)
+    while ((c = getopt (oargc, oargv, "us:l:j:")) != -1)
         switch (c) {
             case 'u': // want to see the genotypes of these SNPs
                 opstru->uflag = 1;
                 break;
-            case 'n': // print per-sample Tech Rep resolution events
-                opstru->nnum = optarg;
+            case 's': // duration.
+                opstru->snum = optarg;
                 break;
             case 'j': // print per-sample Tech Rep resolution events
                 opstru->jnum = optarg;
@@ -68,30 +69,76 @@ int catchopts(optstruct *opstru, int oargc, char **oargv)
     return 0;
 }
 
-int rajuhh(int quanju) /* not equl odds, higher is rarer, of course */
+int rajuhhh(int mxju) /* not equl odds, higher is harder/rarer, harsher version, sum of squares */
 {
     int i;
-    int totsum=quanju*(quanju+1)/2; // typical n(n+1)/2 formula */
-    float *cats=(float*)calloc(quanju-1, sizeof(float));
-    cats[0]=(float)quanju/totsum;
-    for(i=1;i<quanju-1;++i)
-        cats[i]=cats[i-1]+(float)(quanju-i)/totsum;
-    
+    int totsum2=0;
+    for(i=1;i<=mxju;++i)
+        totsum2 += pow(i,2);
+    float *cats=new (nothrow) float[mxju-1];
+    cats[0]=(float)pow(mxju,2)/totsum2;
+    for(i=1;i<mxju-1;++i)
+        cats[i]=cats[i-1]+(float)pow(mxju-i,2)/totsum2;
+
     float ura= 1. - (float)rand()/(RAND_MAX);
 #if DBG
     printf("ura=%4.6f\n", ura); 
 #endif
 
-    for(i=0;i<quanju-1;++i)
+    for(i=0;i<mxju-1;++i)
         if(ura < cats[i]) {
-            free(cats);
+            delete[] cats;
+            return i+1;
+        }
+
+    delete[] cats;
+    // if you reach this point, then it's the max category
+    return i+1;
+}
+
+int rajuhh(int mxju) /* not equl odds, higher is rarer, of course */
+{
+    int i;
+    int totsum=mxju*(mxju+1)/2; // typical n(n+1)/2 formula */
+    float *cats=new (nothrow) float[mxju-1];
+    cats[0]=(float)mxju/totsum;
+    for(i=1;i<mxju-1;++i)
+        cats[i]=cats[i-1]+(float)(mxju-i)/totsum;
+
+    float ura= 1. - (float)rand()/(RAND_MAX);
+#if DBG
+    printf("ura=%4.6f\n", ura); 
+#endif
+
+    for(i=0;i<mxju-1;++i)
+        if(ura < cats[i]) {
+            delete[] cats;
             return i+1;
         }
 
     // if you reach this point, then it's the max category
-    free(cats);
+    delete[] cats;
     return i+1;
 }
+
+vector<ev_t> *get_race(int numreps /* 2 to start with */, int mxju, float lambd)
+{
+    int j;
+    float ura /*  variable to hold one uniform random variable 0-1 */, cumflt;
+    vector<ev_t> *ev2=new (nothrow) vector<ev_t>[numreps];
+
+    for(j=0;j<numreps;++j) {
+        cumflt=.0;
+        do {
+            ura= 1. - (float)rand()/(RAND_MAX);
+            cumflt += -log(ura)/lambd;
+            ev2[j].push_back({cumflt, rajuhh(mxju)});
+        } while(cumflt <1.);
+    }
+
+    return ev2;
+}
+
 
 char *mktmpd(void)
 {
@@ -112,24 +159,41 @@ char *mktmpd(void)
     return myt;
 }
 
+void prtusage(void)
+{
+    printf("jura0: jump race. Arguments as options as follows:\n");
+    printf("       -u, flag for unpredictable random values.\n");
+    printf("       -l, float, lambda value, average number of (jump) events per run.\n");
+    printf("       -s, integer, duration in seconds.\n");
+    printf("       -j, integer, max number of jumps achieveable in single jump event.\n");
+    printf("       -l, -n, and -j are obligatory.\n");
+    exit(EXIT_FAILURE);
+}
+
 int main (int argc, char *argv[])
 {
     colstru_f colsf[18] = { {"foreground", {0.866667, 0.866667, 0.866667} }, {"background", {0.066667, 0.066667, 0.066667} }, {"color0", {0.098039, 0.098039, 0.098039} }, {"color8", {0.627451, 0.321569, 0.176471} }, {"color1", {0.501961, 0.196078, 0.196078} }, {"color9", {0.596078, 0.168627, 0.168627} }, {"color2", {0.356863, 0.462745, 0.184314} }, {"color10", {0.537255, 0.721569, 0.247059} }, {"color3", {0.666667, 0.600000, 0.262745} }, {"color11", {0.937255, 0.937255, 0.376471} }, {"color4", {0.196078, 0.298039, 0.501961} }, {"color12", {0.168627, 0.309804, 0.596078} }, {"color5", {0.439216, 0.423529, 0.603922} }, {"color13", {0.509804, 0.415686, 0.694118} }, {"color6", {0.572549, 0.694118, 0.619608} }, {"color14", {0.631373, 0.803922, 0.803922} }, {"color7", {1.000000, 1.000000, 1.000000} }, {"color15", {0.866667, 0.866667, 0.866667} } };
-    /* argument accounting: here were present the siddferetn shapes that are possible with this program */
-    if(argc!=2) {
-        printf("tdisp. a program to generate small images of certain shapes and random colours.\n");
-        printf("Error. Pls supply 1 argument: 1) Number of seconds.\n");
-        exit(EXIT_FAILURE);
-    }
 
-	char *tmpd=mktmpd();
+    if(argc<7)
+        prtusage();
+
+    int argignore=0; // I know, irrelevant now, but it's how it started: ignoring first few args
+    int oargc=argc-argignore;
+    char **oargv=argv+argignore;
+    optstruct opstru={0};
+    catchopts(&opstru, oargc, oargv);
+
+    // the obligatory options
+    if( (opstru.snum == NULL) | (opstru.jnum == NULL) | (opstru.lfloat == NULL))
+        prtusage();
+
+    char *tmpd=mktmpd();
     printf("%s\n", tmpd); 
-    int n=FPSEC*atoi(argv[1]); // total number of images
+    int ni=FPSEC*atoi(opstru.snum); // total number of images, got directly from duration in seconds.
 
     char nm[FNAMSZ]={0};
     char tstr[FNAMSZ]={0}; // time string
     float tf;
-
 
     int width=640;
     int height=480;
@@ -141,22 +205,28 @@ int main (int argc, char *argv[])
     cairo_text_extents_t te;
     int i;
     int llen= width -2*LMAR;
-    float finc=(float)llen/n;
-    float Zsum=LMAR;
-    float fsum=LMAR;
-    float fsum2=LMAR;
 
-    i=0;
-    int ii[2]= {0,0}; //current indec to check
-    int cha[2]= {0,0}; // change?
-    while(fsum2<llen) {
+    // race is run in advance via:
+    int numreps = 2; // for now anyhow
+    int mxju = atoi(opstru.jnum); /* maximum number of jumps */
+    float lambd = atof(opstru.lfloat);
+    vector<ev_t> *ev2=get_race(numreps, mxju, lambd);
+
+    int t=0; // timer, 1/25 of a second or .04 of a second.
+    float tp; // time proper
+    int ii[2]= {0,0}; //current index to check, for each participant.
+    int pos[2]= {300,340}; //current index to check, for each participant.
+    int startoff;
+
+    while(1) {
+        sprintf(nm, "%s/ffim_%03d.png", tmpd, t);
+        tp=(float)(t+1)/FPSEC; // time proper, i.e. conversion of index time (t) to proper second-fractions.
+        sprintf(tstr, "%4.4f", tp);
+
         cairo_rectangle (cr, 0, 0, width, height); /* arg explan: topleftcorner and size of shape  */
         cairo_set_source_rgb(cr, 0.1, 0.1, 0.1); /* setting background, probab black or grey */
         cairo_fill (cr);
 
-        sprintf(nm, "%s/ffim_%04d.png", tmpd, i);
-        tf=(float)(i+1)/FPSEC;
-        sprintf(tstr, "%4.4f", tf);
         cairo_text_extents (cr, tstr, &te);
         cairo_move_to (cr, LMAR, 240);
         cairo_set_source_rgb(cr, .8, .8, .8);
@@ -165,25 +235,25 @@ int main (int argc, char *argv[])
         // now the first line 
         cairo_set_source_rgba(cr, colsf[13].rgb[0], colsf[13].rgb[1], colsf[13].rgb[2], 0.95);
         // start only half way thourhg first second, and stop at finishline
-        int startoff=FPSEC*3;
-        if(i>startoff) {
-            if(fsum<llen)
-                fsum += finc;
-            cairo_move_to(cr, LMAR , 300); // 300 is vert pos of the line, invariable.
-            cairo_line_to(cr, fsum , 300);
-            cairo_stroke (cr);
+        startoff=FPSEC*3;
+        if(t>startoff) {
+            for(i=0;i<2;++i) {
+                if(tp > ev2[i].at(ii[i]).f) { //tp has met or exceeded first float for this horse
+                    ii[i]++; // move up to next, before doing anything else.
+                    cairo_move_to(cr, LMAR , pos[i]); // 300 is vert pos of the line, invariable.
+                    cairo_line_to(cr, JUSZ*ev2[i].at(ii[i]).j, pos[i]); // num events associated with eventjump
+                    cairo_stroke (cr);
+                }
+            }
         }
-
-        // now the line 
-        cairo_set_source_rgba(cr, colsf[8].rgb[0], colsf[8].rgb[1], colsf[8].rgb[2], 0.95);
-        cairo_move_to(cr, LMAR , 340);
-        fsum2 += 2*finc/3.;
-        cairo_line_to(cr, fsum2 , 340);
-        cairo_stroke (cr);
 
         /* Write output and clean up */
         cairo_surface_write_to_png (surface, nm);
-        i++;
+        t++;
+        if(t>ni)
+            break;
+        if(t>999)
+            break;
     }
     cairo_destroy (cr);
     cairo_surface_destroy (surface);
@@ -197,6 +267,7 @@ int main (int argc, char *argv[])
     system(scall);
 
     free(tmpd);
+    delete[] ev2;
 
     return 0;
 }

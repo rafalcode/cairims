@@ -99,7 +99,6 @@ vector<ev_t> *get_race(int numreps /* 2 to start with */, int randju, float lamb
     return ev2;
 }
 
-
 int main(int argc, char *argv[])
 {
     if(argc<4) {
@@ -133,6 +132,7 @@ int main(int argc, char *argv[])
     vector<ev_t> *ev2=get_race(numreps, mxju, lambd);
 
     int j;
+    printf("Testing access ... %4.4f %i\n", ev2[0].at(0).f, ev2[0].at(0).j);
     for(j=0;j<numreps;++j) {
         for(ev_t ev : ev2[j])
             // cout << 'At time ' << ev.f << ', ' << ev.j << ' jumps / ';
