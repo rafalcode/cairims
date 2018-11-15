@@ -12,6 +12,9 @@
  *  this seems to go too fast
  *  and despite landa being 3, there seems to be way more jumps on average over the distance
  *  so something not great still
+ *
+ *  TODO:
+ *  Put circles in the stop positions, it helps
  */
 #include<cairo/cairo.h>
 #include<math.h>
@@ -31,6 +34,8 @@
 #define FONTSZ 16
 #define LMAR 20
 #define JUSZ .05 // size that a single jump should be as a fraction of the course.
+
+#define SETSEED 5 /*  if -DUNPREDRA is not fed in */
 
 using namespace std;
 
@@ -234,6 +239,16 @@ int main (int argc, char *argv[])
     if( (opstru.snum == NULL) | (opstru.jnum == NULL) | (opstru.lfloat == NULL))
         prtusage();
 
+    struct timeval tnow;
+    unsigned tseed;
+    if(opstru.uflag) {
+        gettimeofday(&tnow, NULL);
+        /*  use the five last digits of the current microsecond reading to generate a seed */
+        tseed=(unsigned int)((tnow.tv_usec/100000.0 - tnow.tv_usec/100000)*RAND_MAX);
+        srand(tseed);
+    } else
+        srand(SETSEED);
+
     char *tmpd=mktmpd();
     printf("%s\n", tmpd); 
     int ni=FPSEC*atoi(opstru.snum); // total number of images, got directly from duration in seconds.
@@ -322,9 +337,9 @@ int main (int argc, char *argv[])
     // ffmpeg -framerate 25 -i ffim_%04d.png output.mp4
     char scall[SYSCMD]={0};
     sprintf(scall, "ffmpeg -loglevel quiet -framerate 25 -i %s/ffim_%%03d.png %s.mp4", tmpd, tmpd);
-    system(scall);
+//    system(scall);
     sprintf(scall, "rm -rf %s", tmpd);
-    system(scall);
+//    system(scall);
 
     free(tmpd);
     delete[] ev2;
