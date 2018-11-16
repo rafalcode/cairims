@@ -337,9 +337,9 @@ int main (int argc, char *argv[])
     // ffmpeg -framerate 25 -i ffim_%04d.png output.mp4
     char scall[SYSCMD]={0};
     sprintf(scall, "ffmpeg -loglevel quiet -framerate 25 -i %s/ffim_%%03d.png %s.mp4", tmpd, tmpd);
-//    system(scall);
+    system(scall);
     sprintf(scall, "rm -rf %s", tmpd);
-//    system(scall);
+    system(scall);
 
     free(tmpd);
     delete[] ev2;
