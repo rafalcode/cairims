@@ -8,7 +8,7 @@ SPECINC=-I/home/nutria/mylocal/include
 SPECINC2=`pkg-config --cflags cairomm-1.0`
 SPECLIBS2=`pkg-config --libs cairomm-1.0`
 
-EXECUTABLES=binodot binind bini2 bini3 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 six b13 b14 doto smasha2 scalin dric3 td2 rcol hsric2 scalin2 tdisp expti0 expti1 randju0 expti2 jura0 jura0_d ptinsq0
+EXECUTABLES=binodot binind bini2 bini3 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 six b13 b14 doto smasha2 scalin dric3 td2 rcol hsric2 scalin2 tdisp expti0 expti1 randju0 expti2 jura0 jura0_d
 
 # small tiny shapes for testing on eigbirds. Tried to not make this output interlaced PNG files
 # but cairo docs explain that this also is a toy API, no control over that.
@@ -113,10 +113,6 @@ b13: b13.c
 # Yes, got it. Orientation is now correct
 
 b14: b14.c
-	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
-
-# Points in square series
-ptinsq0: ptinsq0.c
 	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
 
 # Multicolored lines with title set above
