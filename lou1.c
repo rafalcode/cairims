@@ -4,6 +4,7 @@
 #include <string.h>
 #include <math.h>
 #include <cairo/cairo.h>
+const float FONTSZ=12.0; /* the size (number of colours) that our colorscheme has */
 
 typedef struct 
 {
@@ -32,6 +33,7 @@ int main(int argc, char *argv[])
 
     int ncol= 12;
     int nrow= 4;
+    char nstr[32]={0}; // numstrings.
 
     /* we have an area within the image */
     int awid = imwidth - lmar -rmar; /* (workable) area */
@@ -51,15 +53,30 @@ int main(int argc, char *argv[])
     float bframe = 10; /* frame around each block */
     cairo_set_source_rgba(cr, .0, 0.8, .0, 0.8);
     cairo_set_line_width (cr, 0.75); /* thinnest really possible */
+    /* OK, now, text consideration */
+    cairo_select_font_face (cr, "Monospace", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+    cairo_set_font_size (cr, FONTSZ);
+    cairo_font_extents_t fe;
+    cairo_font_extents(cr, &fe);
+    cairo_text_extents_t te;
+    float rmp[2]; // rectangle mid point
 
     /* We're going to take it in 4 quadrants: each quadrant will be overwritten each time */
     pla_t *tbu=calloc(nrow/2*ncol/2, sizeof(pla_t)); /* plus y */
-    for(j=0;j<ncol/2;++j) {
-        for(i=0;i<nrow/2;++i) {
-            tbu[i+j*nrow/2].stx=cp.stx + bframe/2 + j*(bframe+rhsz);
-            tbu[i+j*nrow/2].sty=cp.sty - bframe/2 - rvsz - i*(bframe+rvsz);
-            cairo_rectangle (cr, tbu[i+j*nrow/2].stx, tbu[i+j*nrow/2].sty, rhsz, rvsz);
+    for(i=0;i<nrow/2;++i) {
+        for(j=0;j<ncol/2;++j) {
+            tbu[i*ncol/2+j].stx=cp.stx + bframe/2 + j*(bframe+rhsz);
+            tbu[i*ncol/2+j].sty=cp.sty - bframe/2 - rvsz - i*(bframe+rvsz);
+            cairo_rectangle (cr, tbu[i*ncol/2+j].stx, tbu[i*ncol/2+j].sty, rhsz, rvsz);
             cairo_stroke(cr);
+            sprintf(nstr, "%i", i*ncol/2+j);
+            rmp[0] = tbu[i*ncol/2+j].stx+rhsz/2;
+            rmp[1] = tbu[i*ncol/2+j].sty+rvsz/2;
+            cairo_text_extents(cr, nstr, &te);
+            // cairo_move_to (cr, rmp[0] - te.x_bearing - te.width/2, rmp[1] - fe.descent + fe.height/2);
+            cairo_move_to (cr, rmp[0] - te.x_bearing - te.width/2, rmp[1] - fe.descent + 1+fe.height/2);
+            cairo_set_source_rgb(cr, 0.9, 0.9, .9);
+            cairo_show_text(cr, nstr);
         }
     }
     for(j=0;j<ncol/2;++j) {
