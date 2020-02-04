@@ -145,6 +145,12 @@ lou0: lou0.c
 	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
 lou1: lou1.c
 	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
+# what lou1 can do: it takes aibsolute horizontal and vert sizes for
+# an object and gives you nrows of them, and ncols, all equally laid out
+# with space for margins.
+# How it still doesn't have text, and only copes with even nrows and even ncols
+# When considering unevens, actually 3 situations arise. nrows is uneven, ncols
+# is uneven, and both are uneven.
 
 # Just display time
 tdisp: tdisp.c
