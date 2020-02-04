@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
     float xtx= bxtx - 2*bframe;
     float xty= bxty - 2*bframe;
 
+
     for(i=0;i<nrow;++i) {
         for(j=0;j<ncol;++j) {
             if(j==0) 
