@@ -4,12 +4,44 @@
 #include <string.h>
 #include <math.h>
 #include <cairo/cairo.h>
-const float FONTSZ=12.0; /* the size (number of colours) that our colorscheme has */
+const float FONTSZ=10.0; /* the size (number of colours) that our colorscheme has */
 
 typedef struct 
 {
     float stx, sty;
 } pla_t; /* placement */
+
+void gethcol(float val, float *rgb) // get a heat colour.
+{
+  // int aR = 0, aG = 0, aB=255;  // RGB for our 1st color (blue in this case).
+  // int bR = 255, bG = 0, bB=0;    // RGB for our 2nd color (red in this case).
+  float aR = 1.0, aG = .0, aB=.0;
+  float bR = .0, bG = 1., bB=.0;    // RGB for our 2nd color (red in this case).
+
+  *rgb   = (float)(bR - aR) * val + aR;      // Evaluated as -255*value + 255.
+  *(rgb+1) = (float)(bG - aG) * val + aG;      // Evaluates as 0.
+  *(rgb+2)  = (float)(bB - aB) * val + aB;      // Evaluates as 255*value + 0.
+}
+
+void gethcol2(float val, float *rgb) // get a heat colour.
+{
+  // int aR = 0, aG = 0, aB=255;  // RGB for our 1st color (blue in this case).
+  // int bR = 255, bG = 0, bB=0;    // RGB for our 2nd color (red in this case).
+  float aR = 1.0, aG = .0, aB=.0;
+  float bR = .0, bG = 1., bB=.0;    // RGB for our 2nd color (red in this case).
+
+  float rval;
+  if( val>0.5) {
+      rval=2*(val-.5);
+      *rgb   = (float)(bR - aR) * rval + aR;      // Evaluated as -255*value + 255.
+      *(rgb+1) = (float)(bG - aG) * rval + aG;      // Evaluates as 0.
+      *(rgb+2)  = (float)(bB - aB) * rval + aB;      // Evaluates as 255*value + 0.
+  } else {
+      *rgb   = 0.3;
+      *(rgb+1) = 0.3;
+      *(rgb+2)  = 0.3;
+  }
+}
 
 int main(int argc, char *argv[])
 {
@@ -31,8 +63,20 @@ int main(int argc, char *argv[])
     cairo_set_source_rgba (cr, 0, 0, 0, 0.95);
     cairo_fill (cr);
 
-    int ncol= 12;
-    int nrow= 6;
+    int ncol= 12, nrow= 8;
+    int totv=nrow*ncol;
+    float *vala=malloc(totv*sizeof(float));
+    for(i=0;i<totv;++i)
+        vala[i] = (float)i/(totv-1);
+    int totv3=totv*3;
+    float *rgba=malloc(totv3*sizeof(float));
+    for(i=0;i<totv;i++)
+        gethcol(vala[i], rgba+3*i);
+    for(i=0;i<totv;i++)
+        printf("%4.2f/%4.2f/%4.2f ", rgba[3*i], rgba[3*i+1], rgba[3*i+2]);
+    printf("\n"); 
+
+    int nc2=ncol/2, nr2=nrow/2;
     char nstr[32]={0}; // numstrings.
 
     /* we have an area within the image */
@@ -51,6 +95,7 @@ int main(int argc, char *argv[])
     cairo_fill(cr);
 
     float bframe = 10; /* frame around each block */
+    float bf2 = bframe/2;
     cairo_set_source_rgba(cr, .0, 0.8, .0, 0.8);
     cairo_set_line_width (cr, 0.75); /* thinnest really possible */
     /* OK, now, text consideration */
@@ -62,105 +107,85 @@ int main(int argc, char *argv[])
     float rmp[2]; // rectangle mid point
 
     /* We're going to take it in 4 quadrants: each quadrant will be overwritten each time */
-    pla_t *tbu=calloc(nrow/2*ncol/2, sizeof(pla_t)); /* plus y */
-    for(i=0;i<nrow/2;++i) {
-        for(j=0;j<ncol/2;++j) {
-            nij = (nrow/2-1-i)*ncol/2+j;
-            nij2 = (ncol/2)*(nrow/2-i)+(nrow/2-1-i)*ncol/2+j;
-            // nij = i*ncol/2+j;
-            tbu[nij].stx=cp.stx + bframe/2 + j*(bframe+rhsz);
-            tbu[nij].sty=cp.sty - bframe/2 - rvsz - i*(bframe+rvsz);
+    pla_t *tbu=calloc(nr2*nc2, sizeof(pla_t)); /* plus y */
+    for(i=0;i<nr2;++i) {
+        for(j=0;j<nc2;++j) {
+            nij = (nr2-1-i)*nc2+j;
+            nij2 = (nc2)*(nr2-i)+nij;
+            tbu[nij].stx=cp.stx + bf2 + j*(bframe+rhsz);
+            tbu[nij].sty=cp.sty - bf2 - rvsz - i*(bframe+rvsz);
+            cairo_set_source_rgba(cr, rgba[3*nij2], rgba[3*nij2+1], rgba[3*nij2+2], 0.8);
             cairo_rectangle (cr, tbu[nij].stx, tbu[nij].sty, rhsz, rvsz);
-            cairo_stroke(cr);
-            sprintf(nstr, "%i", nij2);
+            cairo_fill(cr);
+            sprintf(nstr, "%2.1f%%", 100*vala[nij2]);
             rmp[0] = tbu[nij].stx+rhsz/2;
             rmp[1] = tbu[nij].sty+rvsz/2;
             cairo_text_extents(cr, nstr, &te);
             cairo_move_to (cr, rmp[0] - te.x_bearing - te.width/2, rmp[1] - fe.descent + 1+fe.height/2);
-            cairo_set_source_rgb(cr, 0.9, 0.9, .9);
+            cairo_set_source_rgba(cr, .7, .7, .7, .8);
             cairo_show_text(cr, nstr);
         }
     }
-    for(i=0;i<nrow/2;++i) {
-        for(j=0;j<ncol/2;++j) {
-            nij = i*ncol/2+j;
-            nij2 = ncol*nrow/2+ (ncol/2)*(i+1)+i*ncol/2+j;
-            tbu[nij].stx=cp.stx + bframe/2 + j*(bframe+rhsz);
-            tbu[nij].sty=cp.sty + bframe/2 + i*(bframe+rvsz);
+    for(i=0;i<nr2;++i) {
+        for(j=0;j<nc2;++j) {
+            nij = i*nc2+j;
+            nij2 = ncol*nr2+ (nc2)*(i+1) + nij;
+            tbu[nij].stx=cp.stx + bf2 + j*(bframe+rhsz);
+            tbu[nij].sty=cp.sty + bf2 + i*(bframe+rvsz);
+            cairo_set_source_rgba(cr, rgba[3*nij2], rgba[3*nij2+1], rgba[3*nij2+2], 0.8);
             cairo_rectangle (cr, tbu[nij].stx, tbu[nij].sty, rhsz, rvsz);
-            cairo_stroke(cr);
-            sprintf(nstr, "%i", nij2);
+            cairo_fill(cr);
+            sprintf(nstr, "%2.1f%%", 100*vala[nij2]);
             rmp[0] = tbu[nij].stx+rhsz/2;
             rmp[1] = tbu[nij].sty+rvsz/2;
             cairo_text_extents(cr, nstr, &te);
             cairo_move_to (cr, rmp[0] - te.x_bearing - te.width/2, rmp[1] - fe.descent + 1+fe.height/2);
-            cairo_set_source_rgb(cr, 0.9, 0.9, .9);
+            cairo_move_to (cr, rmp[0] - te.x_bearing - te.width/2, rmp[1] - fe.descent + 1+fe.height/2);
+            cairo_set_source_rgba(cr, .7, .7, .7, .8);
             cairo_show_text(cr, nstr);
         }
     }
-    for(i=0;i<nrow/2;++i) {
-        for(j=0;j<ncol/2;++j) {
-            nij = i*ncol/2+j;
-            nij2 = ncol*nrow/2 + i*ncol+(ncol/2-j-1);
-            // nij2 = ncol*nrow/2+ (ncol/2)*(i+1)+i*ncol/2+(ncol/2-j-1);
-            tbu[nij].stx=cp.stx - bframe/2 - rhsz - j*(bframe+rhsz);
-            tbu[nij].sty=cp.sty + bframe/2 + i*(bframe+rvsz);
+    for(i=0;i<nr2;++i) {
+        for(j=0;j<nc2;++j) {
+            nij = i*nc2+j;
+            nij2 = ncol*nr2 + i*ncol+(nc2-j-1);
+            tbu[nij].stx=cp.stx - bf2 - rhsz - j*(bframe+rhsz);
+            tbu[nij].sty=cp.sty + bf2 + i*(bframe+rvsz);
+            cairo_set_source_rgba(cr, rgba[3*nij2], rgba[3*nij2+1], rgba[3*nij2+2], 0.8);
             cairo_rectangle (cr, tbu[nij].stx, tbu[nij].sty, rhsz, rvsz);
-            cairo_stroke(cr);
-            sprintf(nstr, "%i", nij2);
+            cairo_fill(cr);
+            sprintf(nstr, "%2.1f%%", 100*vala[nij2]);
             rmp[0] = tbu[nij].stx+rhsz/2;
             rmp[1] = tbu[nij].sty+rvsz/2;
             cairo_text_extents(cr, nstr, &te);
             cairo_move_to (cr, rmp[0] - te.x_bearing - te.width/2, rmp[1] - fe.descent + 1+fe.height/2);
-            cairo_set_source_rgb(cr, 0.9, 0.9, .9);
+            cairo_set_source_rgba(cr, .7, .7, .7, .8);
             cairo_show_text(cr, nstr);
         }
     }
-    // for(j=0;j<ncol/2;++j) {
-    //     for(i=0;i<nrow/2;++i) {
-    //         tbu[i+j*nrow/2].stx=cp.stx - bframe/2 -rhsz - j*(bframe+rhsz);
-    //         tbu[i+j*nrow/2].sty=cp.sty + bframe/2 + i*(bframe+rvsz);
-    //         cairo_rectangle (cr, tbu[i+j*nrow/2].stx, tbu[i+j*nrow/2].sty, rhsz, rvsz);
-    //         cairo_stroke(cr);
-    //     }
-    // }
-    for(i=0;i<nrow/2;++i) {
-        for(j=0;j<ncol/2;++j) {
-            nij = (nrow/2-1-i)*ncol/2+j;
-            nij2 = (nrow/2-1-i)*ncol+(ncol/2-j-1);
-            tbu[nij].stx=cp.stx - bframe/2 - rhsz - j*(bframe+rhsz);
-            tbu[nij].sty=cp.sty - bframe/2 - rvsz - i*(bframe+rvsz);
+    for(i=0;i<nr2;++i) {
+        for(j=0;j<nc2;++j) {
+            nij = (nr2-1-i)*nc2+j;
+            nij2 = (nr2-1-i)*ncol+(nc2-j-1);
+            tbu[nij].stx=cp.stx - bf2 - rhsz - j*(bframe+rhsz);
+            tbu[nij].sty=cp.sty - bf2 - rvsz - i*(bframe+rvsz);
+            cairo_set_source_rgba(cr, rgba[3*nij2], rgba[3*nij2+1], rgba[3*nij2+2], 0.8);
             cairo_rectangle (cr, tbu[nij].stx, tbu[nij].sty, rhsz, rvsz);
-            cairo_stroke(cr);
-            sprintf(nstr, "%i", nij2);
+            cairo_fill(cr);
+            sprintf(nstr, "%2.1f%%", 100*vala[nij2]);
             rmp[0] = tbu[nij].stx+rhsz/2;
             rmp[1] = tbu[nij].sty+rvsz/2;
             cairo_text_extents(cr, nstr, &te);
             cairo_move_to (cr, rmp[0] - te.x_bearing - te.width/2, rmp[1] - fe.descent + 1+fe.height/2);
-            cairo_set_source_rgb(cr, 0.9, 0.9, .9);
+            cairo_set_source_rgba(cr, .7, .7, .7, .8);
             cairo_show_text(cr, nstr);
         }
     }
-    // for(i=0;i<nrow/2;++i) {
-    //     for(j=0;j<ncol/2;++j) {
-    //         nij = i*ncol/2+j;
-    //         nij2 = ncol*nrow/2+ (ncol/2)*i+i*ncol/2+j;
-    //         tbu[nij].stx=cp.stx - bframe/2 -rhsz - j*(bframe+rhsz);
-    //         tbu[nij].sty=cp.sty -rhsz - i*(bframe+rvsz);
-    //         cairo_rectangle (cr, tbu[nij].stx, tbu[nij].sty, rhsz, rvsz);
-    //         cairo_stroke(cr);
-    //         sprintf(nstr, "%i", nij2);
-    //         rmp[0] = tbu[nij].stx+rhsz/2;
-    //         rmp[1] = tbu[nij].sty+rvsz/2;
-    //         cairo_text_extents(cr, nstr, &te);
-    //         cairo_move_to (cr, rmp[0] - te.x_bearing - te.width/2, rmp[1] - fe.descent + 1+fe.height/2);
-    //         cairo_set_source_rgb(cr, 0.9, 0.9, .9);
-    //         cairo_show_text(cr, nstr);
-    //     }
-    // }
 
     cairo_surface_write_to_png (surface, "lou1.png");
     free(tbu);
+    free(rgba);
+    free(vala);
     cairo_destroy (cr);
     cairo_surface_destroy (surface);
 
