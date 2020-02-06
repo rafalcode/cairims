@@ -164,7 +164,7 @@ void prtaawcdata(aaw_c *aawc) /* print line and word details, but not the words 
         }
     }
     printf("\n"); 
-	printf("L is a line, l is length of word, S is normal string, C closing punct, Z, starting cap, Y Starting cap and closing punct.\n"); 
+    printf("L is a line, l is length of word, S is normal string, C closing punct, Z, starting cap, Y Starting cap and closing punct.\n"); 
 }
 
 void prtaawcp5(aaw_c *aawc) /* print line and word details, but not the words themselves */
@@ -296,34 +296,34 @@ aaw_c *processincsv(char *fname)
 
 void gethcol(float val, float *rgb) // get a heat colour.
 {
-  // int aR = 0, aG = 0, aB=255;  // RGB for our 1st color (blue in this case).
-  // int bR = 255, bG = 0, bB=0;    // RGB for our 2nd color (red in this case).
-  float aR = 1.0, aG = .0, aB=.0;
-  float bR = .0, bG = 1., bB=.0;    // RGB for our 2nd color (red in this case).
+    // int aR = 0, aG = 0, aB=255;  // RGB for our 1st color (blue in this case).
+    // int bR = 255, bG = 0, bB=0;    // RGB for our 2nd color (red in this case).
+    float aR = 1.0, aG = .0, aB=.0;
+    float bR = .0, bG = 1., bB=.0;    // RGB for our 2nd color (red in this case).
 
-  *rgb   = (float)(bR - aR) * val + aR;      // Evaluated as -255*value + 255.
-  *(rgb+1) = (float)(bG - aG) * val + aG;      // Evaluates as 0.
-  *(rgb+2)  = (float)(bB - aB) * val + aB;      // Evaluates as 255*value + 0.
+    *rgb   = (float)(bR - aR) * val + aR;      // Evaluated as -255*value + 255.
+    *(rgb+1) = (float)(bG - aG) * val + aG;      // Evaluates as 0.
+    *(rgb+2)  = (float)(bB - aB) * val + aB;      // Evaluates as 255*value + 0.
 }
 
 void gethcol2(float val, float *rgb) // get a heat colour.
 {
-  // int aR = 0, aG = 0, aB=255;  // RGB for our 1st color (blue in this case).
-  // int bR = 255, bG = 0, bB=0;    // RGB for our 2nd color (red in this case).
-  float aR = 1.0, aG = .0, aB=.0;
-  float bR = .0, bG = 1., bB=.0;    // RGB for our 2nd color (red in this case).
-
-  float rval;
-  if( val>0.985) {
-      rval=40*(val-.985);
-      *rgb   = (float)(bR - aR) * rval + aR;      // Evaluated as -255*value + 255.
-      *(rgb+1) = (float)(bG - aG) * rval + aG;      // Evaluates as 0.
-      *(rgb+2)  = (float)(bB - aB) * rval + aB;      // Evaluates as 255*value + 0.
-  } else {
-      *rgb   = 0.3;
-      *(rgb+1) = 0.3;
-      *(rgb+2)  = 0.3;
-  }
+    // int aR = 0, aG = 0, aB=255;  // RGB for our 1st color (blue in this case).
+    // int bR = 255, bG = 0, bB=0;    // RGB for our 2nd color (red in this case).
+    float aR = 1.0, aG = .0, aB=.0;
+    float bR = .0, bG = 1., bB=.0;    // RGB for our 2nd color (red in this case).
+    float cR = .4, cG = .8, cB=.0;    // RGB for our 2nd color (red in this case).
+    float rval;
+    float thresh[2]={0.8, 0.9};
+    if(val<0.9) {
+        *rgb   = .9; *(rgb+1) = .1; *(rgb+2)  = 0;
+    } else if(val<0.94) {
+        *rgb   = .8; *(rgb+1) = 0.3; *(rgb+2)  = .1;
+    } else if(val<0.98) {
+        *rgb   = .4; *(rgb+1) = .8; *(rgb+2)  = .2;
+    } else {
+        *rgb   = .1; *(rgb+1) = .9; *(rgb+2)  = .1;
+    }
 }
 
 int main(int argc, char *argv[])
@@ -333,12 +333,16 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
     aaw_c *aawc=processincsv(argv[1]);
-    int rhsz=atoi(argv[2]);
-    int rvsz=atoi(argv[3]);
+    int rw=atoi(argv[2]);
+    int rh=atoi(argv[3]);
 
-    int i, nij, nij2, j;
+    int i, nij, j;
     int lmar =10, rmar =10, tmar =40, bmar =10;
-    int imwidth=800, imheight =600;
+    int imwidth=1024, imheight =768;
+    // int imwidth=800, imheight =600;
+    int awid = imwidth - lmar -rmar; /* (workable) area */
+    int ahei = imheight - tmar -bmar;
+    char *tc;
     cairo_surface_t *surface;
     cairo_t *cr;
     surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, imwidth, imheight);
@@ -346,6 +350,15 @@ int main(int argc, char *argv[])
     cairo_rectangle (cr, 0, 0, imwidth, imheight);
     cairo_set_source_rgba (cr, 0, 0, 0, 0.95);
     cairo_fill (cr);
+    cairo_select_font_face (cr, "Monospace", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+    cairo_set_font_size (cr, 16.0);
+    cairo_font_extents_t fe;
+    cairo_font_extents(cr, &fe);
+    cairo_text_extents_t te;
+    cairo_move_to (cr, lmar - te.x_bearing - te.width/2, tmar/2 - fe.descent + 1+ fe.height);
+    cairo_set_source_rgb(cr, .6, .6, .6);
+    tc=strrchr(argv[1], '/');
+    cairo_show_text(cr, tc+1);
 
     int ncol= 12;
     int nrow = (aawc->numl-3)/ncol;
@@ -368,119 +381,51 @@ int main(int argc, char *argv[])
     int nc2=ncol/2, nr2=nrow/2;
     char nstr[32]={0}; // numstrings.
 
-    /* we have an area within the image */
-    int awid = imwidth - lmar -rmar; /* (workable) area */
-    int ahei = imheight - tmar -bmar;
+    /* we have an area within the image
     cairo_set_source_rgba(cr, .9, .0, .7, 0.9);
     cairo_set_line_width (cr, 0.5);
     cairo_rectangle (cr, lmar, tmar, awid, ahei);
     cairo_stroke(cr);
-
-    pla_t cp;
-    cp.stx=lmar+awid/2;
-    cp.sty=tmar+ahei/2;
+    */
 
     float bframe = 10; /* frame around each block */
     float bf2 = bframe/2;
+    pla_t kp; // keypoint, find centrepoint and subtract
+    kp.stx=(lmar+awid/2) - nc2*(bf2 + rw);
+    kp.sty=(tmar+ahei/2) - nr2*(bf2 + rh);
+
     cairo_set_source_rgba(cr, .0, 0.8, .0, 0.8);
     cairo_set_line_width (cr, 0.75); /* thinnest really possible */
     /* OK, now, text consideration */
-    cairo_select_font_face (cr, "Monospace", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
     cairo_set_font_size (cr, FONTSZ);
-    cairo_font_extents_t fe;
     cairo_font_extents(cr, &fe);
-    cairo_text_extents_t te;
     float rmp[2]; // rectangle mid point
 
     /* We're going to take it in 4 quadrants: each quadrant will be overwritten each time */
-    pla_t *tbu=calloc(nr2*nc2, sizeof(pla_t)); /* plus y */
-    for(i=0;i<nr2;++i) {
-        for(j=0;j<nc2;++j) {
-            nij = (nr2-1-i)*nc2+j;
-            nij2 = (nc2)*(nr2-i)+nij;
-            tbu[nij].stx=cp.stx + bf2 + j*(bframe+rhsz);
-            tbu[nij].sty=cp.sty - bf2 - rvsz - i*(bframe+rvsz);
-            cairo_set_source_rgba(cr, rgba[3*nij2], rgba[3*nij2+1], rgba[3*nij2+2], 0.8);
-            cairo_rectangle (cr, tbu[nij].stx, tbu[nij].sty, rhsz, rvsz);
+    pla_t *tbu=calloc(nrow*ncol, sizeof(pla_t)); /* plus y */
+    for(i=0;i<nrow;++i) {
+        for(j=0;j<ncol;++j) {
+            nij = ncol*i+j;
+            tbu[nij].stx=kp.stx + j*(bframe+rw);
+            tbu[nij].sty=kp.sty + i*(bframe+rh);
+            cairo_set_source_rgba(cr, rgba[3*nij], rgba[3*nij+1], rgba[3*nij+2], 0.8);
+            cairo_rectangle (cr, tbu[nij].stx, tbu[nij].sty, rw, rh);
             cairo_fill(cr);
-            sprintf(nstr, "%2.1f%%", 100*vala[nij2]);
-            rmp[0] = tbu[nij].stx+rhsz/2;
-            rmp[1] = tbu[nij].sty+rvsz/2;
+            sprintf(nstr, "%2.1f%%", 100*vala[nij]);
+            rmp[0] = tbu[nij].stx+rw/2;
+            rmp[1] = tbu[nij].sty+rh/2;
             cairo_text_extents(cr, nstr, &te);
-            cairo_move_to (cr, rmp[0] - te.x_bearing - te.width/2, rmp[1] - fe.descent + 1+fe.height/2);
-            cairo_set_source_rgba(cr, .7, .7, .7, .8);
-            cairo_show_text(cr, nstr);
-            cairo_text_extents(cr, aawc->aaw[nij2+3]->aw[1]->w, &te);
-            cairo_move_to (cr, rmp[0] - te.x_bearing - te.width/2, rmp[1] - fe.descent + fe.height);
-            cairo_show_text(cr, aawc->aaw[nij2+3]->aw[1]->w);
-        }
-    }
-    for(i=0;i<nr2;++i) {
-        for(j=0;j<nc2;++j) {
-            nij = i*nc2+j;
-            nij2 = ncol*nr2+ (nc2)*(i+1) + nij;
-            tbu[nij].stx=cp.stx + bf2 + j*(bframe+rhsz);
-            tbu[nij].sty=cp.sty + bf2 + i*(bframe+rvsz);
-            cairo_set_source_rgba(cr, rgba[3*nij2], rgba[3*nij2+1], rgba[3*nij2+2], 0.8);
-            cairo_rectangle (cr, tbu[nij].stx, tbu[nij].sty, rhsz, rvsz);
-            cairo_fill(cr);
-            sprintf(nstr, "%2.1f%%", 100*vala[nij2]);
-            rmp[0] = tbu[nij].stx+rhsz/2;
-            rmp[1] = tbu[nij].sty+rvsz/2;
-            cairo_text_extents(cr, nstr, &te);
-            cairo_move_to (cr, rmp[0] - te.x_bearing - te.width/2, rmp[1] - fe.descent + 1+fe.height/2);
-            cairo_move_to (cr, rmp[0] - te.x_bearing - te.width/2, rmp[1] - fe.descent + 1+fe.height/2);
-            cairo_set_source_rgba(cr, .7, .7, .7, .8);
-            cairo_show_text(cr, nstr);
-            cairo_text_extents(cr, aawc->aaw[nij2+3]->aw[1]->w, &te);
-            cairo_move_to (cr, rmp[0] - te.x_bearing - te.width/2, rmp[1] - fe.descent + fe.height);
-            cairo_show_text(cr, aawc->aaw[nij2+3]->aw[1]->w);
-        }
-    }
-    for(i=0;i<nr2;++i) {
-        for(j=0;j<nc2;++j) {
-            nij = i*nc2+j;
-            nij2 = ncol*nr2 + i*ncol+(nc2-j-1);
-            tbu[nij].stx=cp.stx - bf2 - rhsz - j*(bframe+rhsz);
-            tbu[nij].sty=cp.sty + bf2 + i*(bframe+rvsz);
-            cairo_set_source_rgba(cr, rgba[3*nij2], rgba[3*nij2+1], rgba[3*nij2+2], 0.8);
-            cairo_rectangle (cr, tbu[nij].stx, tbu[nij].sty, rhsz, rvsz);
-            cairo_fill(cr);
-            sprintf(nstr, "%2.1f%%", 100*vala[nij2]);
-            rmp[0] = tbu[nij].stx+rhsz/2;
-            rmp[1] = tbu[nij].sty+rvsz/2;
-            cairo_text_extents(cr, nstr, &te);
-            cairo_move_to (cr, rmp[0] - te.x_bearing - te.width/2, rmp[1] - fe.descent + 1+fe.height/2);
-            cairo_set_source_rgba(cr, .7, .7, .7, .8);
-            cairo_show_text(cr, nstr);
-            cairo_text_extents(cr, aawc->aaw[nij2+3]->aw[1]->w, &te);
-            cairo_move_to (cr, rmp[0] - te.x_bearing - te.width/2, rmp[1] - fe.descent + fe.height);
-            cairo_show_text(cr, aawc->aaw[nij2+3]->aw[1]->w);
-        }
-    }
-    for(i=0;i<nr2;++i) {
-        for(j=0;j<nc2;++j) {
-            nij = (nr2-1-i)*nc2+j;
-            nij2 = (nr2-1-i)*ncol+(nc2-j-1);
-            tbu[nij].stx=cp.stx - bf2 - rhsz - j*(bframe+rhsz);
-            tbu[nij].sty=cp.sty - bf2 - rvsz - i*(bframe+rvsz);
-            cairo_set_source_rgba(cr, rgba[3*nij2], rgba[3*nij2+1], rgba[3*nij2+2], 0.6);
-            cairo_rectangle (cr, tbu[nij].stx, tbu[nij].sty, rhsz, rvsz);
-            cairo_fill(cr);
-            sprintf(nstr, "%2.1f%%", 100*vala[nij2]);
-            rmp[0] = tbu[nij].stx+rhsz/2;
-            rmp[1] = tbu[nij].sty+rvsz/2;
-            cairo_text_extents(cr, nstr, &te);
+            // cairo_move_to (cr, rmp[0] - te.x_bearing - te.width/2, rmp[1] - fe.descent + 1+fe.height/2);
             cairo_move_to (cr, rmp[0] - te.x_bearing - te.width/2, rmp[1] - fe.descent);
-            cairo_set_source_rgba(cr, .9, .9, .9, .9);
+            cairo_set_source_rgb(cr, .0, .0, .0);
             cairo_show_text(cr, nstr);
-            cairo_text_extents(cr, aawc->aaw[nij2+3]->aw[1]->w, &te);
-            cairo_move_to (cr, rmp[0] - te.x_bearing - te.width/2, rmp[1] - fe.descent + fe.height);
-            cairo_show_text(cr, aawc->aaw[nij2+3]->aw[1]->w);
+            cairo_text_extents(cr, aawc->aaw[nij+3]->aw[1]->w, &te);
+            cairo_move_to (cr, rmp[0] - te.x_bearing - te.width/2, rmp[1] - fe.descent + 1+ fe.height);
+            cairo_show_text(cr, aawc->aaw[nij+3]->aw[1]->w);
         }
     }
 
-    cairo_surface_write_to_png (surface, "crhmap.png");
+    cairo_surface_write_to_png (surface, "crhmap2.png");
     free(tbu);
     free(rgba);
     free(vala);
