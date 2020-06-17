@@ -9,10 +9,10 @@
 
 /* now the principle canvas definition settings, which is the image dimensions minus the margins
  * follows vim direction conventions*/
-#define IMLMARG 0 /* left margin */
-#define IMBMARG 0 /* bottom */
-#define IMRMARG 0
-#define IMTMARG 0
+#define IMLMARG 20 /* left margin */
+#define IMBMARG 40 /* bottom */
+#define IMRMARG 20
+#define IMTMARG 40
 
 /* principal image and block settings */
 #define IMWIDTH 640
@@ -323,7 +323,7 @@ int main (int argc, char *argv[])
     aaw_c *aawc=processincsv(argv[1]);
     // prtaawcp5(aawc); // printout original text as well as you can.
     unsigned rbnum = (aawc->numl-3)/CBNUM;
-    float cbsz=(float)IMWIDTH/CBNUM;
+    float cbsz=(float)IMWIDTH/CBNUM-IMLMARG-IMRMARG;
     float rbsz=(float)IMHEIGHT/rbnum;
     printf("%4.2f %4.2f\n", cbsz, rbsz);
 

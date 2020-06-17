@@ -165,7 +165,7 @@ void prtaawcplain(aaw_c *aawc) /* print line and word details, but not the words
     for(i=0;i<aawc->numl;++i) {
         printf("L%u(%uw):", i, aawc->aaw[i]->al); 
         for(j=0;j<aawc->aaw[i]->al;++j) {
-            printf("s1+%u ", aawc->aaw[i]->aw[j]->lp1);
+            printf("l%u/", aawc->aaw[i]->aw[j]->lp1-1);
             printf((j!=aawc->aaw[i]->al-1)?"%s ":"%s\n", aawc->aaw[i]->aw[j]->w);
         }
     }
@@ -313,7 +313,8 @@ int main(int argc, char *argv[])
 #ifdef DBG
     prtaawcdbg(aawc);
 #else
-    prtaawcp5(aawc); // printout original text as well as you can.
+    // prtaawcp5(aawc); // printout original text as well as you can.
+    prtaawcplain(aawc); // printout original text as well as you can.
 #endif
     // printf("Numlines: %zu\n", aawc->numl); 
 
