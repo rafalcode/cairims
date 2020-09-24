@@ -28,12 +28,12 @@
 #include<iostream>
 #include<vector>
 
-#define FPSEC 25 // change this to 30 if required.
+#define FPSEC 5 // change this to 30 if required.
 #define FNAMSZ 64 // for the output file name
 #define SYSCMD 128
 #define FONTSZ 16
 #define LMAR 20
-#define JUSZ .05 // size that a single jump should be as a fraction of the course.
+#define JUSZ .02 // size that a single jump should be as a fraction of the course.
 
 #define SETSEED 5 /*  if -DUNPREDRA is not fed in */
 
@@ -104,6 +104,10 @@ float *juint2(int mxju) /* not equl odds, higher is harder/rarer, harsher versio
 
 float *juint0(int mxju) /* jump intervals: not equl odds, higher is rarer, of course */
 {
+    /* what is this function? It looks like a simple linspace. Em, no, it's something else */
+    /* No it's like the fairground, you throw the ball up and there are only a small number of jumop sizes
+     * say three or four, the high ones are harder to get. */
+
     int i;
     int totsum=mxju*(mxju+1)/2; // typical n(n+1)/2 formula */
     float *cats=new (nothrow) float[mxju-1];
@@ -116,6 +120,7 @@ float *juint0(int mxju) /* jump intervals: not equl odds, higher is rarer, of co
 
 int rajuhh0(int mxju)
 {
+    /* returns the size/stride of a jump */
     int i;
     float *cats=juint0(mxju);
     float ura= 1. - (float)rand()/(RAND_MAX);
@@ -201,6 +206,7 @@ char *mktmpd(void)
 void prtvec(vector<ev_t>* ev2, int numreps)
 {
     int j;
+    printf("prtvec:\n"); 
     for(j=0;j<numreps;++j) {
         printf("Rep %i) ", j+1); 
         for(ev_t ev : ev2[j])
@@ -215,10 +221,10 @@ void prtusage(void)
 {
     printf("jura0: jump race. Arguments as options as follows:\n");
     printf("       -u, flag for unpredictable random values.\n");
-    printf("       -l, float, lambda value, average number of (jump) events per run.\n");
+    printf("       -l, float, lambda value, average number of (jump) events per run. What's a run. The whole race?");
     printf("       -s, integer, duration in seconds.\n");
     printf("       -j, integer, max number of jumps achieveable in single jump event.\n");
-    printf("       -l, -n, and -j are obligatory.\n");
+    printf("       -l, -s, and -j are obligatory.\n");
     exit(EXIT_FAILURE);
 }
 
@@ -312,7 +318,8 @@ int main (int argc, char *argv[])
                     }
                 }
 #ifdef DBG
-                printf("i %i @t %i @tf %4.4f: tohere: %4.4f\n", i, t, tp, tohere[i]);
+                // printf("i %i @t %i @tf %4.4f: tohere: %4.4f\n", i, t, tp, tohere[i]);
+                printf("h#%i: %4.4fsecs at dist %4.4f\n", i, tp, tohere[i]);
 #endif
 
                 cairo_move_to(cr, LMAR , pos[i]); // 300 is vert pos of the line, invariable.
@@ -338,8 +345,8 @@ int main (int argc, char *argv[])
     char scall[SYSCMD]={0};
     sprintf(scall, "ffmpeg -loglevel quiet -framerate 25 -i %s/ffim_%%03d.png %s.mp4", tmpd, tmpd);
     system(scall);
-    sprintf(scall, "rm -rf %s", tmpd);
-    system(scall);
+    // sprintf(scall, "rm -rf %s", tmpd);
+    // system(scall);
 
     free(tmpd);
     delete[] ev2;
