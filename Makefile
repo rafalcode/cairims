@@ -8,7 +8,7 @@ SPECINC=-I/home/nutria/mylocal/include
 SPECINC2=`pkg-config --cflags cairomm-1.0`
 SPECLIBS2=`pkg-config --libs cairomm-1.0`
 
-EXECUTABLES=binodot binind bini2 bini3 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 six b13 b14 doto smasha2 scalin dric3 td2 rcol hsric2 scalin2 tdisp expti0 expti1 randju0 expti2 jura0 jura0_d ptinsq0 rcol2 csvrd rcol rcol3 lou0 lou1 crhmap lou2 lou3 ptinsq0
+EXECUTABLES=binodot binind bini2 bini3 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 six b13 b14 doto smasha2 scalin dric3 td2 rcol hsric2 scalin2 tdisp expti0 expti1 randju0 expti2 jura0 jura0_d ptinsq0 rcol2 csvrd rcol rcol3 lou0 lou1 crhmap lou2 lou3 trial0 trial1 trial2 rcol4 ptinsq0 b14a simpsq0 simpsq2 pattapp0
 
 # small tiny shapes for testing on eigbirds. Tried to not make this output interlaced PNG files
 # but cairo docs explain that this also is a toy API, no control over that.
@@ -45,6 +45,14 @@ td2: td2.c
 	./$@
 	feh $@.png
 
+simpsq0: simpsq0.c
+	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
+	./$@
+	feh $@.png
+simpsq2: simpsq2.c
+	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
+	./$@
+	feh $@.png
 # 
 binind: binind.c
 	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
@@ -114,6 +122,8 @@ b13: b13.c
 
 b14: b14.c
 	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
+b14a: b14a.c
+	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
 
 # Multicolored lines with title set above
 # rescuing
@@ -139,6 +149,8 @@ rcol2: rcol2.c
 csvrd: csvrd.c
 	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
 rcol3: rcol3.c
+	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
+rcol4: rcolr.c
 	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
 # layout experiments
 lou0: lou0.c
@@ -191,6 +203,18 @@ jura0_d: jura0.cpp
 # example of cairomm which is the c++ PAI for cairo
 mm0: mm0.cpp
 	${CPP} ${CFLAGS} ${SPECINC2} -o $@ $^ ${SPECLIBS2}
+
+trial0: trial0.c
+	${CC} ${CFLAGS} ${SPECINC2} -o $@ $^ ${SPECLIBS2}
+
+trial2: trial2.c
+	${CC} ${CFLAGS} ${SPECINC2} -o $@ $^ ${SPECLIBS2}
+
+pattapp0: pattapp0.c
+	${CC} ${CFLAGS} ${SPECINC2} -o $@ $^ ${SPECLIBS2}
+
+ptinsq0: ptinsq0.c
+	${CC} ${CFLAGS} ${SPECINC2} -o $@ $^ ${SPECLIBS2}
 
 .PHONY: clean
 

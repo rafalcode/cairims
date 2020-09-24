@@ -339,10 +339,12 @@ int main(int argc, char *argv[])
     int i, nij, j;
     int lmar =10, rmar =10, tmar =40, bmar =10;
     int imwidth=1024, imheight =768;
+    //
     // int imwidth=800, imheight =600;
     int awid = imwidth - lmar -rmar; /* (workable) area */
     int ahei = imheight - tmar -bmar;
     char *tc;
+
     cairo_surface_t *surface;
     cairo_t *cr;
     surface = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, imwidth, imheight);
@@ -400,6 +402,7 @@ int main(int argc, char *argv[])
     cairo_set_font_size (cr, FONTSZ);
     cairo_font_extents(cr, &fe);
     float rmp[2]; // rectangle mid point
+    char *tc0, tc2;
 
     /* We're going to take it in 4 quadrants: each quadrant will be overwritten each time */
     pla_t *tbu=calloc(nrow*ncol, sizeof(pla_t)); /* plus y */

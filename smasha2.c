@@ -44,7 +44,7 @@ int main (int argc, char *argv[])
     int n=atoi(argv[1]);
     int n3=3*n; // for each image we'll want 3 0-1 floats for color-setting.
 
-    char nm[32]={0};
+    char nm[32]={0}; /* a name string */
 
     int width=atoi(argv[2]);
     int height=width;
@@ -52,13 +52,12 @@ int main (int argc, char *argv[])
     cairo_t *cr = cairo_create (surface);
     int i;
     float *r=randf01(n3*2);
-    float *circdiv=randf01(n); // circle divisor
+    float *circdiv=randf01(n); // circle divisor prep: randums 0 to 1.0
     for(i=0;i<n;++i) 
-        circdiv[i] = 2*circdiv[i]+3.0; // so divisor will vary from 3 to 6
+        circdiv[i] = 2*circdiv[i]+3.0; // so now divisor will vary from 3 to 6
     sha_t *rsha=rshat(n);
 
     /*  first we're going to set the background */
-
     for(i=0;i<n;++i) {
         cairo_rectangle (cr, 0, 0, width, height); /* arg explan: topleftcorner and size of shape  */
         cairo_set_source_rgb(cr, 0.1, 0.1, 0.1); /* setting background, probab black or grey */
