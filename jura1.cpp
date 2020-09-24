@@ -28,12 +28,15 @@
 #include<iostream>
 #include<vector>
 
-#define FPSEC 25 // change this to 30 if required.
+#define FPSEC 5 // change this to 30 if required.
 #define FNAMSZ 64 // for the output file name
 #define SYSCMD 128
 #define FONTSZ 16
 #define LMAR 20
-#define JUSZ .05 // size that a single jump should be as a fraction of the course.
+#define TMAR 40
+#define BMAR 20
+#define JUSZ .02 // size that a single jump should be as a fraction of the course.
+#define NHORSE 2
 
 #define SETSEED 5 /*  if -DUNPREDRA is not fed in */
 
@@ -104,6 +107,10 @@ float *juint2(int mxju) /* not equl odds, higher is harder/rarer, harsher versio
 
 float *juint0(int mxju) /* jump intervals: not equl odds, higher is rarer, of course */
 {
+    /* what is this function? It looks like a simple linspace. Em, no, it's something else */
+    /* No it's like the fairground, you throw the ball up and there are only a small number of jumop sizes
+     * say three or four, the high ones are harder to get. */
+
     int i;
     int totsum=mxju*(mxju+1)/2; // typical n(n+1)/2 formula */
     float *cats=new (nothrow) float[mxju-1];
@@ -116,6 +123,7 @@ float *juint0(int mxju) /* jump intervals: not equl odds, higher is rarer, of co
 
 int rajuhh0(int mxju)
 {
+    /* returns the size/stride of a jump */
     int i;
     float *cats=juint0(mxju);
     float ura= 1. - (float)rand()/(RAND_MAX);
@@ -201,6 +209,7 @@ char *mktmpd(void)
 void prtvec(vector<ev_t>* ev2, int numreps)
 {
     int j;
+    printf("prtvec:\n"); 
     for(j=0;j<numreps;++j) {
         printf("Rep %i) ", j+1); 
         for(ev_t ev : ev2[j])
@@ -215,10 +224,10 @@ void prtusage(void)
 {
     printf("jura0: jump race. Arguments as options as follows:\n");
     printf("       -u, flag for unpredictable random values.\n");
-    printf("       -l, float, lambda value, average number of (jump) events per run.\n");
+    printf("       -l, float, lambda value, average number of (jump) events per run. What's a run. The whole race?");
     printf("       -s, integer, duration in seconds.\n");
     printf("       -j, integer, max number of jumps achieveable in single jump event.\n");
-    printf("       -l, -n, and -j are obligatory.\n");
+    printf("       -l, -s, and -j are obligatory.\n");
     exit(EXIT_FAILURE);
 }
 
@@ -276,25 +285,49 @@ int main (int argc, char *argv[])
     prtvec(ev2, numreps);
 #endif
 
-    int t=0; // timer, 1/25 of a second or .04 of a second.
     float tp; // time proper
     unsigned ii[2]= {0,0}; //current index to check, for each participant.
     int fl[2]= {width-LMAR, width-LMAR}; //finish line
-    int pos[2]= {300,340}; //current index to check, for each participant.
+    // int vpos[2]= {300,340}; //current index to check, for each participant.
+    float hstep=(float)(width-TMAR-BMAR)/NHORSE;
+    // float *vpos=malloc(NHORSE*sizeof(float));
+    // vector<float> vpos;
+    vector<float> vpos;
+    vpos.reserve(NHORSE);
+    vpos.push_back(TMAR);
+    for(i=1;i<NHORSE;++i)
+        vpos.push_back(vpos[i-1]+hstep);
     int startoff=0;
     float tohere[2]={LMAR, LMAR};
 
+    /* initial image with dots */
+    sprintf(tstr, "%4.4f", 0.);
+    sprintf(nm, "%s/ffim_%03d.png", tmpd, 0);
+    cairo_rectangle (cr, 0, 0, width, height); /* arg explan: topleftcorner and size of shape  */
+    cairo_set_source_rgb(cr, 0.1, 0.1, 0.1); /* setting background, probab black or grey */
+    cairo_fill (cr);
+    cairo_text_extents (cr, tstr, &te);
+    cairo_move_to (cr, LMAR, TMAR-10);
+    cairo_set_source_rgb(cr, .8, .8, .8);
+    cairo_show_text (cr, tstr);
+    cairo_set_source_rgba(cr, colsf[13].rgb[0], colsf[13].rgb[1], colsf[13].rgb[2], 0.95);
+    for(i=0;i<NHORSE;++i)
+        cairo_arc(cr, LMAR, vpos[i], 1, 0, 2 * M_PI);
+    cairo_stroke (cr);
+    cairo_surface_write_to_png (surface, nm);
+
+    /* Now onto race itself */
+    int t=1; // timer, 1/25 of a second or .04 of a second.
     while(1) {
         sprintf(nm, "%s/ffim_%03d.png", tmpd, t);
-        tp=(float)(t+1)/FPSEC; // time proper, i.e. conversion of index time (t) to proper second-fractions.
+        tp=(float)t/FPSEC; // time proper, i.e. conversion of index time (t) to proper second-fractions.
         sprintf(tstr, "%4.4f", tp);
 
         cairo_rectangle (cr, 0, 0, width, height); /* arg explan: topleftcorner and size of shape  */
         cairo_set_source_rgb(cr, 0.1, 0.1, 0.1); /* setting background, probab black or grey */
         cairo_fill (cr);
-
         cairo_text_extents (cr, tstr, &te);
-        cairo_move_to (cr, LMAR, 240);
+        cairo_move_to (cr, LMAR, TMAR-10);
         cairo_set_source_rgb(cr, .8, .8, .8);
         cairo_show_text (cr, tstr);
 
@@ -312,12 +345,18 @@ int main (int argc, char *argv[])
                     }
                 }
 #ifdef DBG
-                printf("i %i @t %i @tf %4.4f: tohere: %4.4f\n", i, t, tp, tohere[i]);
+                // printf("i %i @t %i @tf %4.4f: tohere: %4.4f\n", i, t, tp, tohere[i]);
+                // printf("h#%i: %4.4fsecs at dist %4.4f\n", i, tp, tohere[i]); // tohere is actually not cumulative. It's the lenght of stride in pixels.
+                /* oh no! a lot of confusion! tohere IS cumulative, it's name even suggests it! It's in pixels */
+                // printf("h#%i: %4.4fsecs at dist %4.4f\n", i, tp, tohere[i]);
 #endif
 
-                cairo_move_to(cr, LMAR , pos[i]); // 300 is vert pos of the line, invariable.
+                cairo_move_to(cr, LMAR , vpos[i]); // 300 is vert pos of the line, invariable.
                 // cairo_line_to(cr, JUSZ*ev2[i].at(ii[i]).j, pos[i]); // num events associated with eventjump
-                cairo_line_to(cr, tohere[i], pos[i]); // num events associated with eventjump
+                cairo_line_to(cr, tohere[i], vpos[i]);
+#ifdef DBG
+                printf("%i %4.4f %4.4f\n", i, tohere[i], vpos[i]);
+#endif
                 cairo_stroke (cr);
             }
         }
@@ -338,8 +377,8 @@ int main (int argc, char *argv[])
     char scall[SYSCMD]={0};
     sprintf(scall, "ffmpeg -loglevel quiet -framerate 25 -i %s/ffim_%%03d.png %s.mp4", tmpd, tmpd);
     system(scall);
-    sprintf(scall, "rm -rf %s", tmpd);
-    system(scall);
+    // sprintf(scall, "rm -rf %s", tmpd);
+    // system(scall);
 
     free(tmpd);
     delete[] ev2;
