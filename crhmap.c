@@ -329,13 +329,15 @@ void gethcol2(float val, float *rgb) // get a heat colour.
 int main(int argc, char *argv[])
 {
     if(argc!=4) {
-        printf("crhmap. Three args 1) DNAreport csv 2) height of rect 3) width of rect (try 30 20 for a start).");
+        printf("crhmap. Outputs an sample plate arrangement, in heatmap style, where color gives percetnage of called SNPs.\n");
+        printf("        The size of overall image is hardcoded, though maybe later will decide image size.\n");
+        printf("        Three args 1) DNAreport csv 2) height of samplrect 3) width of same (try 30 20 for a start).");
         exit(EXIT_FAILURE);
     }
     aaw_c *aawc=processincsv(argv[1]);
     int rw=atoi(argv[2]);
     int rh=atoi(argv[3]);
-
+    // prtaawcp5(aawc);
     int i, nij, j;
     int lmar =10, rmar =10, tmar =40, bmar =10;
     int imwidth=1024, imheight =768;
@@ -343,7 +345,7 @@ int main(int argc, char *argv[])
     // int imwidth=800, imheight =600;
     int awid = imwidth - lmar -rmar; /* (workable) area */
     int ahei = imheight - tmar -bmar;
-    char *tc;
+    char *tc  =NULL;
 
     cairo_surface_t *surface;
     cairo_t *cr;
@@ -353,14 +355,17 @@ int main(int argc, char *argv[])
     cairo_set_source_rgba (cr, 0, 0, 0, 0.95);
     cairo_fill (cr);
     cairo_select_font_face (cr, "Monospace", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-    cairo_set_font_size (cr, 16.0);
+    cairo_set_font_size (cr, 14.0);
     cairo_font_extents_t fe;
     cairo_font_extents(cr, &fe);
     cairo_text_extents_t te;
-    cairo_move_to (cr, lmar - te.x_bearing - te.width/2, tmar/2 - fe.descent + 1+ fe.height);
     cairo_set_source_rgb(cr, .6, .6, .6);
+    cairo_move_to (cr, lmar - te.x_bearing - te.width/2, tmar/2 - fe.descent + 1+ fe.height);
     tc=strrchr(argv[1], '/');
-    cairo_show_text(cr, tc+1);
+    if(tc ==NULL)
+        cairo_show_text(cr, argv[1]);
+    else 
+        cairo_show_text(cr, tc+1);
 
     int ncol= 12;
     int nrow = (aawc->numl-3)/ncol;
