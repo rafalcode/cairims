@@ -1,6 +1,10 @@
-scalin
-smasha
-smasha2
-dric3
-hsric2
-*.png
+*
+!*.py
+!*.c
+!*.cpp
+!*.h
+!*.csv
+!*.t
+!*.txt
+!Makefile
+!LICENSE

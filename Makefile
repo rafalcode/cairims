@@ -168,6 +168,8 @@ lou3: lou3.c
 # When considering unevens, actually 3 situations arise. nrows is uneven, ncols
 # is uneven, and both are uneven.
 # colour heatmap
+crhmap0: crhmap0.c
+	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
 crhmap: crhmap.c
 	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
 #using  the simplified lou3.c:
