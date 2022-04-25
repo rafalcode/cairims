@@ -7,10 +7,10 @@
 #include "csvrd.h"
 const float FONTSZ=10.0; /* the size (number of colours) that our colorscheme has */
 
-typedef struct 
+typedef struct /* pla_t */
 {
     float stx, sty;
-} pla_t; /* placement */
+} pla_t;
 
 w_c *crea_wc(unsigned initsz)
 {
@@ -388,13 +388,6 @@ int main(int argc, char *argv[])
     int nc2=ncol/2, nr2=nrow/2;
     char nstr[32]={0}; // numstrings.
 
-    /* we have an area within the image
-    cairo_set_source_rgba(cr, .9, .0, .7, 0.9);
-    cairo_set_line_width (cr, 0.5);
-    cairo_rectangle (cr, lmar, tmar, awid, ahei);
-    cairo_stroke(cr);
-    */
-
     float bframe = 10; /* frame around each block */
     float bf2 = bframe/2;
     pla_t kp; // keypoint, find centrepoint and subtract
@@ -411,14 +404,16 @@ int main(int argc, char *argv[])
 
     /* We're going to take it in 4 quadrants: each quadrant will be overwritten each time */
     pla_t *tbu=calloc(nrow*ncol, sizeof(pla_t)); /* plus y */
+    cairo_set_line_width(cr, 5);
     for(i=0;i<nrow;++i) {
         for(j=0;j<ncol;++j) {
             nij = ncol*i+j;
             tbu[nij].stx=kp.stx + j*(bframe+rw);
             tbu[nij].sty=kp.sty + i*(bframe+rh);
             cairo_set_source_rgba(cr, rgba[3*nij], rgba[3*nij+1], rgba[3*nij+2], 0.8);
-            cairo_rectangle (cr, tbu[nij].stx, tbu[nij].sty, rw, rh);
-            cairo_fill(cr);
+            cairo_new_sub_path(cr);
+            cairo_arc(cr, tbu[nij].stx+rw/2., tbu[nij].sty+rh/2., rw/2., 0 , 2*M_PI);
+            cairo_stroke(cr);
             sprintf(nstr, "%2.1f%%", 100*vala[nij]);
             rmp[0] = tbu[nij].stx+rw/2;
             rmp[1] = tbu[nij].sty+rh/2;
@@ -433,7 +428,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    cairo_surface_write_to_png (surface, "crhmap2.png");
+    cairo_surface_write_to_png (surface, "crhmap.png");
     free(tbu);
     free(rgba);
     free(vala);
