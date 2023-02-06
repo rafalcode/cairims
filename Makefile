@@ -8,12 +8,16 @@ SPECINC=-I/home/nutria/mylocal/include
 SPECINC2=`pkg-config --cflags cairomm-1.0`
 SPECLIBS2=`pkg-config --libs cairomm-1.0`
 
-EXECUTABLES=binodot binind bini2 bini3 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 six b13 b14 doto smasha2 scalin dric3 td2 rcol hsric2 scalin2 tdisp expti0 expti1 randju0 expti2 jura0 jura0_d rcol2 csvrd rcol rcol3 lou0 lou1 crhmap0 crhmap crhmap2 crhmap3 lou2 lou3 trial0 trial1 trial2 rcol4 ptinsq0 b14a simpsq0 simpsq2 pattapp0 jura1_d
+EXECUTABLES=binodot binind bini2 bini3 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 six b13 b14 doto smasha2 scalin dric3 td2 rcol hsric2 scalin2 tdisp expti0 expti1 randju0 expti2 jura0 jura0_d rcol2 csvrd rcol rcol3 lou0 lou1 crhmap0 crhmap crhmap2 crhmap3 lou2 lou3 trial0 trial1 trial2 rcol4 ptinsq0 b14a simpsq0 simpsq2 pattapp0 jura1_d gri0
 
 # small tiny shapes for testing on eigbirds. Tried to not make this output interlaced PNG files
 # but cairo docs explain that this also is a toy API, no control over that.
 smasha: smasha.c
 	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
+
+# Amazingly I've never done a simple grid!
+gri0: gri0.c
+	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS} -lm
 
 # generate a quantity of small tiny shapes with random colours
 # initially it was either rect of circle ... but the overall shape needs to be the same ... so now it's rect with algithly varying circle inside
