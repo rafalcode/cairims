@@ -76,8 +76,11 @@ int main (int argc, char *argv[])
     // actually better word outer limits.
     int extent = NUMHL/2; // integer div, if NUMHL=7, we get 3.
     int *vind=calloc(extent+1, sizeof(int));
-    for(i=1;i<=extent;++i) 
-        vind[i] = 0x01<<i;
+    for(i=1;i<=extent;++i) {
+        vind[i] = 0x01<<(i-1);
+        printf("vind-%i=%i", i, vind[i]);
+    }
+    printf("\n"); 
 
     // dots
     cairo_set_source_rgba(cr, 0.85, 0.1, 0.2, 0.8);
