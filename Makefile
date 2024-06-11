@@ -8,7 +8,7 @@ SPECINC=-I/home/nutria/mylocal/include
 SPECINC2=`pkg-config --cflags cairomm-1.0`
 SPECLIBS2=`pkg-config --libs cairomm-1.0`
 
-EXECUTABLES=binodot binind bini2 bini3 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 six b13 b14 doto smasha2 scalin dric3 td2 rcol hsric2 scalin2 tdisp expti0 expti1 randju0 expti2 jura0 jura0_d rcol2 csvrd rcol rcol3 lou0 lou1 crhmap0 crhmap crhmap2 crhmap3 lou2 lou3 trial0 trial1 trial2 rcol4 ptinsq0 b14a simpsq0 simpsq2 pattapp0 jura1_d gri0 gra0 sixa bincomp
+EXECUTABLES=binodot binind bini2 bini3 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 six b13 b14 doto smasha2 scalin dric3 td2 rcol hsric2 scalin2 tdisp expti0 expti1 randju0 expti2 jura0 jura0_d rcol2 csvrd rcol rcol3 lou0 lou1 crhmap0 crhmap crhmap2 crhmap3 lou2 lou3 trial0 trial1 trial2 rcol4 ptinsq0 b14a simpsq0 simpsq2 pattapp0 jura1_d gri0 gri1 gra0 sixa bincomp barcentre sndg
 
 # small tiny shapes for testing on eigbirds. Tried to not make this output interlaced PNG files
 # but cairo docs explain that this also is a toy API, no control over that.
@@ -17,6 +17,8 @@ smasha: smasha.c
 
 # Amazingly I've never done a simple grid!
 gri0: gri0.c
+	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS} -lm
+gri1: gri1.c
 	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS} -lm
 
 # colour gradients
@@ -121,6 +123,12 @@ six: six.c
 sixa: sixa.c
 	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
 bincomp: bincomp.c
+	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
+barcentre: barcentre.c
+	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
+
+# using barcentre for sndg sound graph
+sndg: sndg.c
 	${CC} ${CFLAGS} -o $@ $^ ${SPECLIBS}
 
 # OK, it also took me a while to get the first seven points (though I calle dthe program "six")
