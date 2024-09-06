@@ -1,10 +1,10 @@
-/* use trndot.c ibut to do to do a simple grid */
+/* i think i wanted to graph a sound wave in this one. */
 #include <cairo/cairo.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "wavtab.h"
+// #include "wavtab.h"
 
 #define HBARNUMS 3
 #define NXPTS 256
